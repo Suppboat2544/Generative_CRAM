@@ -103,7 +103,7 @@ Full Julia guide: [julia/README.md](julia/README.md)
 
 ## 3. Python CVAE (trained size)
 
-Production latent space is **64**, not 128.
+Production latent space is **64**.
 
 ```text
 SMILES → graph (163D atom features)

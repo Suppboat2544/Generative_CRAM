@@ -44,7 +44,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
     ],
-    packages=find_packages(exclude=["tests", "tests.*", "notebooks"]),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.9",
     install_requires=requirements,
     extras_require={

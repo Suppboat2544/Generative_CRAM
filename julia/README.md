@@ -243,7 +243,7 @@ If you use this software in your research, please cite:
 ```bibtex
 @software{cram_generator_julia,
   title = {CRAM Generator - Julia Edition},
-  author = {CRAM Generator Team},
+  author = {Klabklaydee Supaporn},
   year = {2026},
   url = {https://github.com/Suppboat2544/Generative_CRAM}
 }

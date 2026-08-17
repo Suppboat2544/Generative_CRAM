@@ -2,7 +2,6 @@
 Deep CRAM Encoder
 =================
 Graph-based encoder using Graph Attention Networks.
-Matches the notebook CRAM_Generator_Production2.ipynb implementation.
 """
 
 import torch

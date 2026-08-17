@@ -13,7 +13,7 @@ Features:
 - Network graphs and dendrograms
 - Advanced color mapping and annotations
 
-Author: CRAM Generator Team
+Author: Klabklaydee Supaporn
 Date: November 2025
 """
 

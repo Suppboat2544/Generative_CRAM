@@ -13,7 +13,7 @@
 FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
 
 # Metadata
-LABEL maintainer="CRAM Generator Team" \
+LABEL maintainer="Klabklaydee Supaporn" \
       version="1.0.0" \
       description="CRAM Molecule Generator - GPU Version"
 

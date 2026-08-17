@@ -2,7 +2,6 @@
 Property Condition Encoder
 ==========================
 Encode molecular properties into condition vectors for CVAE.
-Matches the notebook CRAM_Generator_Production2.ipynb implementation.
 """
 
 import torch

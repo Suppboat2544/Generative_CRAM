@@ -1,6 +1,6 @@
 # Scripts
 
-Standalone Python utilities (no notebooks).
+Standalone Python utilities.
 
 | Script | Purpose |
 |--------|---------|

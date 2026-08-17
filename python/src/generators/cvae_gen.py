@@ -2,7 +2,6 @@
 Fast Property-Conditioned CVAE Generator
 =========================================
 Generate molecules with specific property conditions.
-Matches the notebook CRAM_Generator_Production2.ipynb implementation.
 """
 
 import random

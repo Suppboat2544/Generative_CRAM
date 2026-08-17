@@ -7,7 +7,7 @@ Optimized for A0 poster presentation
 
 Each function creates ONE standalone figure.
 
-Author: CRAM Generator Team
+Author: Klabklaydee Supaporn
 Date: November 2025
 """
 

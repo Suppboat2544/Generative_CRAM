@@ -77,7 +77,7 @@ RUN pip install -r requirements.txt || true
 FROM python:3.10-slim AS production
 
 # Metadata
-LABEL maintainer="CRAM Generator Team" \
+LABEL maintainer="Klabklaydee Supaporn" \
       version="1.0.0" \
       description="CRAM Molecule Generator - Deep Learning for Marine DOM"
 

@@ -13,7 +13,7 @@ Components:
 5. Molecular Dynamics Trajectories (RMSD, energy, contacts)
 6. Summary Statistics (distributions, clusters, stability)
 
-Author: CRAM Generator Team
+Author: Klabklaydee Supaporn
 Date: November 2025
 """
 

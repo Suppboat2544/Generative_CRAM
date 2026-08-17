@@ -7,7 +7,7 @@ Optimized for A0 poster at 700 DPI
 
 Each visualization tells a complete story on its own.
 
-Author: CRAM Generator Team
+Author: Klabklaydee Supaporn
 Date: November 2025
 """
 

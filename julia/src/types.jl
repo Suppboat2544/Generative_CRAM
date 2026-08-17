@@ -109,7 +109,7 @@ const CRAM_CRITERIA = (
 """
     RING_CLASSES
 
-Ring class encoding (aligned with notebook):
+Ring class encoding:
 - FUSED_ARO_ALICYCLIC (0): Fused aromatic-alicyclic rings
 - MIXED_ARO_ALICYCLIC (1): Mixed aromatic-alicyclic rings
 - BENZENE_ALIPHATIC (2): Benzene with aliphatic chains

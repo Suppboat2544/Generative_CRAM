@@ -2,7 +2,7 @@
 
 Property-conditioned CVAE for CRAM generation. Run all commands from this folder (`python/`).
 
-The trained production model uses a **64-dimensional latent space** (not 128).
+The trained production CVAE uses a **64-dimensional latent space**.
 
 ---
 

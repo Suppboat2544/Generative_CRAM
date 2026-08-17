@@ -5,10 +5,8 @@ Enhanced CRAM Generator for Bi-/Tri-/Quad-Alicyclic Molecules
 This module extends PropertyConditionEncoder to support explicit control over
 the NUMBER of alicyclic rings, enabling targeted generation of:
 - Bicyclic alicyclic (2 fused alicyclic rings)
-- Tricyclic alicyclic (3 fused alicyclic rings)  
+- Tricyclic alicyclic (3 fused alicyclic rings)
 - Polycyclic alicyclic (4+ fused alicyclic rings)
-
-Add this cell to your notebook after PropertyConditionEncoder definition.
 """
 
 import torch

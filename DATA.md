@@ -37,7 +37,7 @@ A typical checkpoint path for CVAE sampling:
 python/models/cvae_best.pt
 ```
 
-or whatever filename is inside the Drive `models/` folder.
+Use the actual filename from the Drive `models/` folder if it differs.
 
 ## Use after download
 
