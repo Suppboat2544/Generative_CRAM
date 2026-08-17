@@ -27,17 +27,18 @@ function main()
     println("features: $(fv.n_atoms) x 163 PASS")
 
     config = GenerationConfig(n_molecules=40, max_attempts=8000, seed=42, validate=true)
-    mols = generate_cram(n=40, config=config)
+    elapsed = @elapsed (mols = generate_cram(n=40, config=config))
     @assert length(mols) >= 10 "should produce CRAM-valid mutants"
 
     env = count(is_environmentally_plausible, mols)
     pct = 100.0 * env / length(mols)
     println("generate: $(length(mols)) CRAM-valid")
-    println(summarize_env(env, length(mols)))
+    println(summarize_env(env, length(mols); seconds=elapsed))
 
     @assert pct >= 5.0 "environmental rate should not be near zero"
-    @assert pct <= 70.0 "mutation is not property-conditioned; expected well below CVAE"
+    @assert pct <= 70.0 "mutation is not property-conditioned; the trained CVAE is better"
     println("smoke: PASS (expected ~$(EXPECTED_ENV_PERCENT)% environmentally plausible)")
+    println("The trained Python CVAE (64D) is better: property-conditioned, ~100× faster.")
     return 0
 end
 

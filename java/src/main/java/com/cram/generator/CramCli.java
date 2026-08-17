@@ -231,7 +231,13 @@ public class CramCli implements Callable<Integer> {
                     ? new MutationGenerator(validator)
                     : new MutationGenerator(validator, seed);
             var smiles = generator.generate(count, maxAttempts);
-            System.out.printf("Generated %d CRAM molecules (mutation / CDK)%n", smiles.size());
+            System.out.printf(
+                    "Generated %d CRAM molecules (mutation / CDK) in %.2f s (%.1f mol/s)%n",
+                    smiles.size(),
+                    generator.getLastElapsedSeconds(),
+                    generator.getLastElapsedSeconds() <= 0.0 || smiles.isEmpty()
+                            ? 0.0
+                            : smiles.size() / generator.getLastElapsedSeconds());
             if (outputFile != null) {
                 try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
                     writer.println("smiles");
@@ -289,7 +295,8 @@ public class CramCli implements Callable<Integer> {
                 }
             }
             System.out.printf("generate: %d CRAM-valid%n", smiles.size());
-            System.out.print(EnvironmentalPlausibility.summarize(env, smiles.size()));
+            System.out.print(EnvironmentalPlausibility.summarize(
+                    env, smiles.size(), generator.getLastElapsedSeconds()));
             if (smiles.size() < 10) {
                 System.err.println("smoke FAIL: too few CRAM-valid mutants");
                 return 1;
@@ -329,7 +336,9 @@ public class CramCli implements Callable<Integer> {
 
                 Java edition: validate, 163D features, mutation generate.
                 Mutation typically passes only ~30% environmentally plausible
-                (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). CVAE stays in python/.
+                (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70).
+                The trained Python CVAE (64D) is better: property-conditioned,
+                ~100× faster, no reject loop.
                 
                 """);
             return 0;

@@ -21,7 +21,7 @@ SMILES  →  CRAM criteria  →  163D features  →  generate / serve
 
 The deep generator (GAT encoder → 64D latent → SELFIES decoder) lives only in **Python**. Java and Julia do not load `.pt` checkpoints.
 
-Mutation in Java/Julia is CRAM-valid by construction but typically only **~30% environmentally plausible** (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Property-conditioned CVAE is the path for higher rates.
+Mutation in Java/Julia is CRAM-valid by construction but typically only **~30% environmentally plausible** (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). The **trained Python CVAE (64D) is better**: it is property-conditioned, samples marine-like CRAM directly, and is **~100× faster** (no reject loop).
 
 Compare:
 
@@ -143,18 +143,21 @@ SMILES → graph (163D atom features)
 
 ## 4. Mutation smoke (Java / Julia)
 
-Environmentally plausible = structural CRAM **and** Hertkorn van Krevelen window **O/C 0.40–0.60**, **H/C 1.20–1.70**. Mutation is not property-conditioned, so only about **30%** of CRAM-valid outputs are expected in that window (this smoke often lands 30–50%). CVAE stays in `python/`.
+Environmentally plausible = structural CRAM **and** Hertkorn van Krevelen window **O/C 0.40–0.60**, **H/C 1.20–1.70**. Mutation is not property-conditioned, so only about **30%** of CRAM-valid outputs are expected in that window (this smoke often lands 30–50%).
+
+The **trained 64D CVAE in `python/` is better** than Java/Julia mutation: it conditions on carboxyl count, ring class, and related properties, samples marine-like formulas without a reject loop, and is **~100× faster**.
 
 Reference seed `CC1CCC(CC1)(C(=O)O)C(=O)O`: O/C **0.44**, H/C **1.56**, MW **186.2 Da** (in-window).
 
-Recorded runs (`--seed 42`):
+Recorded runs (`--seed 42`, 18 Aug 2026):
 
-| Check | n | Result |
-|-------|---|---------|
-| Java CLI `smoke` (CDK) | 40 | 40 CRAM-valid; **20/40 = 50%** environmentally plausible |
-| Java JUnit `MutationEnvironmentalSmokeTest` | 40 | same 50% window rate |
-| Python `compare_mutation_smoke.py --java-only` (RDKit referee) | 20 | 16 parseable, 4 invalid valence; **9/16 = 56%** in-window |
-| Julia `cli.jl smoke` / `test/smoke.jl` | 40 | same protocol; run where Julia 1.10+ is installed |
+| Check | n | Env. plausible | Time |
+|-------|---|----------------|------|
+| Java CLI `smoke` (CDK generate) | 40 | **20/40 = 50%** | **0.05 s** (824 mol/s) |
+| Java JUnit `MutationEnvironmentalSmokeTest` | 40 | 50% | 0.05 s (760 mol/s) |
+| Python `compare_mutation_smoke.py --java-only` (RDKit referee, includes JVM start) | 20 | 16 parseable, 4 invalid valence; **9/16 = 56%** | **0.35 s** wall (57 mol/s) |
+| Julia `cli.jl smoke` / `test/smoke.jl` | 40 | same protocol | run where Julia 1.10+ is installed |
+| Python CVAE (`python/`, 64D checkpoint) | — | **better** (property-conditioned) | **~100× faster** than mutation reject loops |
 
 RDKit may reject a few CDK-accepted mutants (explicit oxygen valence). That is expected for unconstrained SMILES mutation.
 

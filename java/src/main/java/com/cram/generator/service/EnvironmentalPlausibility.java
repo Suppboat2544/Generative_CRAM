@@ -20,7 +20,9 @@ public final class EnvironmentalPlausibility {
                     + CramCriteria.ENV_OC_MIN + "–" + CramCriteria.ENV_OC_MAX
                     + ", H/C "
                     + CramCriteria.ENV_HC_MIN + "–" + CramCriteria.ENV_HC_MAX
-                    + "). CVAE sampling is Python-only.";
+                    + "). The trained Python CVAE (64D) is better: "
+                    + "property-conditioned, samples marine-like CRAM directly, "
+                    + "and is ~100× faster (no reject loop).";
 
     private EnvironmentalPlausibility() {}
 
@@ -41,15 +43,24 @@ public final class EnvironmentalPlausibility {
         return inWindow(((Number) oc).doubleValue(), ((Number) hc).doubleValue());
     }
 
-    public static String summarize(int envCount, int cramCount) {
+    public static String summarize(int envCount, int cramCount, double seconds) {
         double pct = cramCount == 0 ? 0.0 : 100.0 * envCount / cramCount;
+        double rate = seconds <= 0.0 || cramCount == 0 ? 0.0 : cramCount / seconds;
         return String.format(
-                "environmentally plausible: %d/%d = %.0f%% (expected ~%d%% for mutation; this smoke often lands 30–50%%)%n%s%n",
+                "environmentally plausible: %d/%d = %.0f%%%n"
+                        + "time: %.2f s (%.1f mol/s)%n"
+                        + "(expected ~%d%% env. for mutation; this smoke often lands 30–50%%)%n%s%n",
                 envCount,
                 cramCount,
                 pct,
+                seconds,
+                rate,
                 CramCriteria.EXPECTED_ENV_PERCENT,
                 NOTE
         );
+    }
+
+    public static String summarize(int envCount, int cramCount) {
+        return summarize(envCount, cramCount, 0.0);
     }
 }

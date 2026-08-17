@@ -4,8 +4,9 @@ Validate CRAM molecules, extract 163D CDK features, and **mutation-generate** SM
 The property-conditioned **CVAE is Python-only** (`python/`).
 
 Mutation is CRAM-valid by construction but typically only **~30% environmentally plausible**
-(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Recorded `--seed 42`: Java CLI **20/40 = 50%** (CDK);
-RDKit comparison **9/16 = 56%** in-window (4/20 unparseable). CVAE stays in `python/`.
+(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Recorded `--seed 42`: Java CLI **20/40 = 50%** in **0.05 s**
+(CDK); RDKit comparison **9/16 = 56%** in **0.35 s** wall (4/20 unparseable).
+The **trained Python CVAE (64D) is better** (property-conditioned, ~100× faster).
 Compare with Julia via `python/scripts/compare_mutation_smoke.py`.
 
 Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)

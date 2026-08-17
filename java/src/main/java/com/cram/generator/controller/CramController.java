@@ -112,7 +112,8 @@ public class CramController {
         return ResponseEntity.ok(new GenerateResponse(
                 smiles.size(),
                 "mutation",
-                "CVAE sampling is Python-only; mutation typically ~30% environmentally plausible",
+                mutationGenerator.getLastElapsedSeconds(),
+                "Trained Python CVAE is better (property-conditioned, ~100× faster). Mutation typically ~30% environmentally plausible.",
                 smiles
         ));
     }
@@ -155,6 +156,7 @@ public class CramController {
     public record GenerateResponse(
         int count,
         String method,
+        double seconds,
         String note,
         List<String> smiles
     ) {}

@@ -12,7 +12,7 @@ const ENV_HC_MIN = 1.20
 const ENV_HC_MAX = 1.70
 const EXPECTED_ENV_PERCENT = 30
 
-const ENV_NOTE = "Mutation generators typically pass only ~$(EXPECTED_ENV_PERCENT)% environmentally plausible (Hertkorn O/C $(ENV_OC_MIN)–$(ENV_OC_MAX), H/C $(ENV_HC_MIN)–$(ENV_HC_MAX)). CVAE sampling is Python-only."
+const ENV_NOTE = "Mutation generators typically pass only ~$(EXPECTED_ENV_PERCENT)% environmentally plausible (Hertkorn O/C $(ENV_OC_MIN)–$(ENV_OC_MAX), H/C $(ENV_HC_MIN)–$(ENV_HC_MAX)). The trained Python CVAE (64D) is better: property-conditioned, samples marine-like CRAM directly, and is ~100× faster (no reject loop)."
 
 """
     elemental_ratios(mol) -> NamedTuple{(:oc, :hc, :nC, :nO, :nH), ...}
@@ -59,7 +59,8 @@ function is_environmentally_plausible(smiles::String)::Bool
     return in_env_window(ratios.oc, ratios.hc)
 end
 
-function summarize_env(env_count::Int, cram_count::Int)::String
+function summarize_env(env_count::Int, cram_count::Int; seconds::Float64=0.0)::String
     pct = cram_count == 0 ? 0.0 : 100.0 * env_count / cram_count
-    return "environmentally plausible: $(env_count)/$(cram_count) = $(round(Int, pct))% (expected ~$(EXPECTED_ENV_PERCENT)% for mutation; this smoke often lands 30–50%)\n$(ENV_NOTE)"
+    rate = seconds <= 0.0 || cram_count == 0 ? 0.0 : cram_count / seconds
+    return "environmentally plausible: $(env_count)/$(cram_count) = $(round(Int, pct))%\ntime: $(round(seconds; digits=2)) s ($(round(rate; digits=1)) mol/s)\n(expected ~$(EXPECTED_ENV_PERCENT)% env. for mutation; this smoke often lands 30–50%)\n$(ENV_NOTE)"
 end

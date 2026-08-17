@@ -63,6 +63,7 @@ public class MutationGenerator {
     }
 
     public List<String> generate(int n, int maxAttempts) {
+        long t0 = System.nanoTime();
         Set<String> unique = new LinkedHashSet<>();
         int attempts = 0;
         while (unique.size() < n && attempts < maxAttempts) {
@@ -80,8 +81,26 @@ public class MutationGenerator {
                         : canonical);
             }
         }
-        log.info("Generated {}/{} CRAM molecules in {} attempts", unique.size(), n, attempts);
+        double seconds = (System.nanoTime() - t0) / 1_000_000_000.0;
+        double rate = unique.isEmpty() || seconds <= 0.0 ? 0.0 : unique.size() / seconds;
+        log.info("Generated {}/{} CRAM molecules in {} attempts ({} s, {} mol/s)",
+                unique.size(), n, attempts,
+                String.format("%.2f", seconds),
+                String.format("%.1f", rate));
+        lastElapsedSeconds = seconds;
+        lastAttempts = attempts;
         return new ArrayList<>(unique);
+    }
+
+    private double lastElapsedSeconds;
+    private int lastAttempts;
+
+    public double getLastElapsedSeconds() {
+        return lastElapsedSeconds;
+    }
+
+    public int getLastAttempts() {
+        return lastAttempts;
     }
 
     private String mutate(String smiles) {

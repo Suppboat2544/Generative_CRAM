@@ -8,7 +8,8 @@ Environmentally plausible = structural CRAM plus Hertkorn van Krevelen:
 
 Mutation typically lands only ~30% of CRAM-valid outputs in that window
 (this smoke often lands 30–50%; Java --seed 42 recorded 50% CDK / 56% RDKit).
-Property-conditioned CVAE training and .pt sampling stay in python/.
+The trained Python CVAE (64D) is better: property-conditioned, samples
+marine-like CRAM directly, and is ~100× faster (no reject loop).
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -30,6 +32,10 @@ ENV_OC = (0.40, 0.60)
 ENV_HC = (1.20, 1.70)
 EXPECTED_ENV_PCT = 30
 SEED = "CC1CCC(CC1)(C(=O)O)C(=O)O"
+CVAE_NOTE = (
+    "The trained Python CVAE (64D) is better than Java/Julia mutation: "
+    "property-conditioned marine CRAM, ~100× faster, no reject loop."
+)
 
 
 def score_smiles(smiles: str):
@@ -76,35 +82,39 @@ def load_smiles(path: Path) -> list[str]:
     return [line.strip() for line in text if line.strip() and not line.startswith("#")]
 
 
-def run_java(n: int, out_csv: Path, seed: int) -> bool:
+def timed_run(cmd: list[str], cwd: Path) -> float:
+    t0 = time.perf_counter()
+    subprocess.run(cmd, check=True, cwd=cwd)
+    return time.perf_counter() - t0
+
+
+def run_java(n: int, out_csv: Path, seed: int) -> float | None:
     if not JAR.exists():
         print(f"skip Java: missing {JAR} (run: cd java && mvn package -DskipTests)")
-        return False
+        return None
     cmd = [
         "java", "-jar", str(JAR), "generate",
         "-n", str(n), "-o", str(out_csv),
         "--max-attempts", "8000",
         "--seed", str(seed),
     ]
-    subprocess.run(cmd, check=True, cwd=JAVA_DIR)
-    return True
+    return timed_run(cmd, JAVA_DIR)
 
 
-def run_julia(n: int, out_csv: Path, seed: int) -> bool:
+def run_julia(n: int, out_csv: Path, seed: int) -> float | None:
     if shutil.which("julia") is None:
         print("skip Julia: julia not on PATH")
-        return False
+        return None
     cmd = [
         "julia", "--project=.", "cli.jl", "generate",
         "-n", str(n), "-o", str(out_csv),
         "--max-attempts", "8000",
         "--seed", str(seed),
     ]
-    subprocess.run(cmd, check=True, cwd=JULIA_DIR)
-    return True
+    return timed_run(cmd, JULIA_DIR)
 
 
-def summarize(name: str, smiles: list[str]) -> dict:
+def summarize(name: str, smiles: list[str], seconds: float) -> dict:
     rows = []
     skipped = 0
     for s in smiles:
@@ -116,12 +126,14 @@ def summarize(name: str, smiles: list[str]) -> dict:
     env = sum(1 for r in rows if r["env"])
     n = len(rows)
     pct = 0.0 if n == 0 else 100.0 * env / n
+    rate = 0.0 if seconds <= 0 else len(smiles) / seconds
     print(f"\n{name}")
     print(f"  CRAM-valid generated : {len(smiles)}")
     print(f"  scored (RDKit)       : {n}  (unparseable {skipped})")
     print(f"  environmentally ok   : {env}/{n} = {pct:.0f}%")
+    print(f"  time                 : {seconds:.2f} s ({rate:.1f} mol/s)")
     print(f"  expected for mutation: ~{EXPECTED_ENV_PCT}% (this smoke often lands 30–50%)")
-    return {"name": name, "n": n, "env": env, "pct": pct}
+    return {"name": name, "n": n, "env": env, "pct": pct, "seconds": seconds}
 
 
 def main() -> int:
@@ -140,33 +152,37 @@ def main() -> int:
     print(f"  O/C={seed_score['oc']:.2f}  H/C={seed_score['hc']:.2f}  MW={seed_score['mw']:.1f}")
     print(
         f"\nMutation (Java/Julia) is expected to pass only ~{EXPECTED_ENV_PCT}% "
-        "environmentally plausible.\nCVAE / .pt sampling stays in python/."
+        "environmentally plausible."
     )
+    print(CVAE_NOTE)
 
     summaries = []
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         if not args.julia_only:
             java_csv = tmp_path / "java.csv"
-            if run_java(args.n, java_csv, args.seed) and java_csv.exists():
-                summaries.append(summarize("Java mutation", load_smiles(java_csv)))
+            elapsed = run_java(args.n, java_csv, args.seed)
+            if elapsed is not None and java_csv.exists():
+                summaries.append(summarize("Java mutation", load_smiles(java_csv), elapsed))
         if not args.java_only:
             julia_csv = tmp_path / "julia.csv"
-            if run_julia(args.n, julia_csv, args.seed) and julia_csv.exists():
-                summaries.append(summarize("Julia mutation", load_smiles(julia_csv)))
+            elapsed = run_julia(args.n, julia_csv, args.seed)
+            if elapsed is not None and julia_csv.exists():
+                summaries.append(summarize("Julia mutation", load_smiles(julia_csv), elapsed))
 
     if not summaries:
         print("No editions ran. Build the Java JAR and/or install Julia.", file=sys.stderr)
         return 1
 
     print("\nComparison")
-    print(f"{'edition':<18} {'CRAM n':>8} {'env n':>8} {'env %':>8}  expected")
+    print(f"{'edition':<18} {'CRAM n':>8} {'env n':>8} {'env %':>8} {'time s':>8}  expected")
     for row in summaries:
         print(
-            f"{row['name']:<18} {row['n']:>8} {row['env']:>8} {row['pct']:>7.0f}%  ~{EXPECTED_ENV_PCT}%"
+            f"{row['name']:<18} {row['n']:>8} {row['env']:>8} {row['pct']:>7.0f}% "
+            f"{row['seconds']:>7.2f}  ~{EXPECTED_ENV_PCT}%"
         )
-    print("\n" + "Mutation generators typically pass only ~30% environmentally plausible.")
-    print("Use python/ CVAE when you need property-conditioned marine CRAM.")
+    print("\nMutation generators typically pass only ~30% environmentally plausible.")
+    print(CVAE_NOTE)
     return 0
 
 

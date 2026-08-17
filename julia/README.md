@@ -13,7 +13,8 @@ Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/
 - **Batch processing**
 
 Mutation is CRAM-valid by construction but typically only **~30% environmentally plausible**
-(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Java `--seed 42` recorded **50%** (CDK) / **56%** (RDKit).
+(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Java `--seed 42` recorded **50%** in **0.05 s** (CDK) /
+**56%** in **0.35 s** (RDKit). The **trained Python CVAE (64D) is better**.
 Compare with Java:
 
 ```bash

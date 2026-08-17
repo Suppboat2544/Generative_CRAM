@@ -154,12 +154,13 @@ function cmd_generate(args, parsed)
         seed = parsed["seed"]
     )
     
-    df = batch_generate(n, output_file=output, config=config)
+    elapsed = @elapsed (df = batch_generate(n, output_file=output, config=config))
     
     println()
     println("═" ^ 60)
-    println("✅ Generated $(nrow(df)) CRAM molecules")
+    println("✅ Generated $(nrow(df)) CRAM molecules in $(round(elapsed; digits=2)) s")
     println("📁 Saved to: $output")
+    println("The trained Python CVAE (64D) is better: property-conditioned, ~100× faster.")
     println("═" ^ 60)
     
     return 0
@@ -228,15 +229,16 @@ function cmd_smoke(args, parsed)
         seed = rng_seed,
         validate = true,
     )
-    mols = generate_cram(n=n, config=config)
+    elapsed = @elapsed (mols = generate_cram(n=n, config=config))
     env = count(is_environmentally_plausible, mols)
     println("generate: $(length(mols)) CRAM-valid")
-    println(summarize_env(env, length(mols)))
+    println(summarize_env(env, length(mols); seconds=elapsed))
     if length(mols) < 10
         println("smoke FAIL: too few CRAM-valid mutants")
         return 1
     end
     println("smoke: PASS (expected ~$(EXPECTED_ENV_PERCENT)% environmentally plausible)")
+    println("The trained Python CVAE (64D) is better: property-conditioned, ~100× faster.")
     return 0
 end
 

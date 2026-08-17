@@ -54,13 +54,14 @@ class MutationEnvironmentalSmokeTest {
         }
         double pct = 100.0 * env / smiles.size();
         System.out.printf("Java mutation CRAM-valid: %d%n", smiles.size());
-        System.out.print(EnvironmentalPlausibility.summarize(env, smiles.size()));
+        System.out.print(EnvironmentalPlausibility.summarize(
+                env, smiles.size(), generator.getLastElapsedSeconds()));
 
         // Smoke, not a chemistry paper: generation must work. The ~30% figure is
-        // the documented mutation limitation versus Python CVAE.
+        // the documented mutation limitation versus the trained Python CVAE.
         assertTrue(pct >= 5.0, "environmental rate should not be near zero");
         assertTrue(pct <= 70.0,
-                "mutation is not property-conditioned; rate should stay well below CVAE");
+                "mutation is not property-conditioned; the trained CVAE is better");
         System.out.printf("expected ~%d%%%n", CramCriteria.EXPECTED_ENV_PERCENT);
     }
 }
