@@ -9,7 +9,7 @@ Mutation is CRAM-valid by construction but typically only **~30% environmentally
 The **trained Python CVAE (64D) is better** (property-conditioned, ~100× faster).
 Compare with Julia via `python/scripts/compare_mutation_smoke.py`.
 
-Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
+Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md) · [design](../DESIGN.md)
 
 SMILES tables for batch validation: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) ([DATA.md](../DATA.md)).
 

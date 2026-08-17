@@ -3,7 +3,7 @@
 Validate CRAM molecules, extract 163D features, and **mutation-generate** SMILES
 (MolecularGraph.jl). This is not the Python CVAE.
 
-Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/README.md) · [repo root](../README.md)
+Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/README.md) · [repo root](../README.md) · [design](../DESIGN.md)
 
 ## Features
 

@@ -1,6 +1,6 @@
 # Data, models, and generated structures
 
-Weights, training tables, and generated molecule files are **not** stored in git. Download them from Google Drive:
+Weights, training tables, and generated molecule files are **not** stored in git. Download them from Google Drive. Architecture: [DESIGN.md](DESIGN.md).
 
 **[CRAM Drive folder](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing)**
 

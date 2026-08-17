@@ -2,7 +2,8 @@
 
 Toolkit for **validating, encoding, and generating Carboxyl-Rich Alicyclic Molecules (CRAM)** — refractory components of marine dissolved organic matter (DOM).
 
-Three nested language editions share the same chemistry rules. Start with Python if you need the CVAE; use Java for a REST API; use Julia for fast CLI validation and mutation.
+**Design:** [DESIGN.md](DESIGN.md) — editions, CVAE vs mutation, 163D features, smoke timings.  
+**Data / weights:** [DATA.md](DATA.md) — Google Drive (`cram_data`, `models`, `Generated_Structures`).
 
 ```text
 SMILES  →  CRAM criteria  →  163D features  →  generate / serve
@@ -15,23 +16,15 @@ SMILES  →  CRAM criteria  →  163D features  →  generate / serve
 
 | Folder | Role | Typical command |
 |--------|------|-----------------|
-| [`python/`](python/README.md) | **CVAE** (64D latent), Gradio, training | `cd python && python main.py generate --mode vae ...` |
-| [`java/`](java/README.md) | Validate, 163D features, **mutation** generate, REST | `cd java && java -jar ... generate -n 50` |
-| [`julia/`](julia/README.md) | Validate, 163D features, **mutation** generate | `cd julia && julia cli.jl generate -n 50` |
+| [`python/`](python/README.md) | **Trained CVAE** (64D latent), Gradio, training | `cd python && python main.py generate --mode vae ...` |
+| [`java/`](java/README.md) | Validate, 163D features, mutation, REST | `cd java && java -jar ... smoke -n 40` |
+| [`julia/`](julia/README.md) | Validate, 163D features, mutation | `cd julia && julia cli.jl smoke -n 40` |
 
-The deep generator (GAT encoder → 64D latent → SELFIES decoder) lives only in **Python**. Java and Julia do not load `.pt` checkpoints.
+The deep generator (GAT → 64D latent → SELFIES decoder) lives only in **Python**. Java and Julia do not load `.pt` files.
 
-Mutation in Java/Julia is CRAM-valid by construction but typically only **~30% environmentally plausible** (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). The **trained Python CVAE (64D) is better**: it is property-conditioned, samples marine-like CRAM directly, and is **~100× faster** (no reject loop).
+The **trained 64D CVAE is the better generator**: property-conditioned marine CRAM, no SMILES reject loop, **~100× faster** than mutation. Java/Julia mutation is CRAM-valid by construction but typically only **~30% environmentally plausible** (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70; recorded Java `--seed 42`: 50% in 0.05 s). Details: [DESIGN.md](DESIGN.md#6-mutation-smoke-results).
 
-Compare:
-
-```bash
-# from repo root, after building java/target/cram-generator-1.0.0.jar
-cd python
-python scripts/compare_mutation_smoke.py -n 40 --seed 42
-```
-
-Notebooks and large binaries are not in git. Download **data, models, and generated structures** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) — see [DATA.md](DATA.md).
+Notebooks and large binaries are not in git.
 
 ---
 
@@ -44,17 +37,15 @@ Notebooks and large binaries are not in git. Download **data, models, and genera
 | Aliphatic carbon | ≥ 60% |
 | Molecular weight | 100–750 Da |
 
-Example SMILES:
+Example: `CC1CCC(CC1)(C(=O)O)C(=O)O`
 
-```text
-CC1CCC(CC1)(C(=O)O)C(=O)O
-```
+Environmentally plausible overlay (Hertkorn): **O/C 0.40–0.60**, **H/C 1.20–1.70**.
 
 ---
 
 ## 2. Choose a path
 
-### A. Generate or train (Python)
+### A. Train or sample the CVAE (Python)
 
 ```bash
 git clone https://github.com/Suppboat2544/Generative_CRAM.git
@@ -64,132 +55,78 @@ pip install -U pip torch
 pip install dgl -f https://data.dgl.ai/wheels/repo.html
 pip install -r requirements.txt
 pip install -e .
-
-python main.py validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
-python main.py generate --mode mutation --count 100 --output outputs/cram_mutants.csv
-python main.py ui --port 7860
 ```
 
-Train (latent dim **64**, matching the production checkpoint):
+Place Drive downloads first (`cram_data` → `python/data/`, `models` → `python/models/`). Then:
 
 ```bash
-cd python
+python main.py validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
+python main.py generate --mode vae --checkpoint models/cvae_best.pt --count 100
+python main.py ui --port 7860
 python scripts/train_cvae.py --smiles-csv data/cram_molecules.csv --epochs 50 --latent-dim 64
 ```
 
-Full Python guide: [python/README.md](python/README.md)
+Full guide: [python/README.md](python/README.md)
 
-Place Drive downloads first (`cram_data` → `python/data/`, `models` → `python/models/`). Details: [DATA.md](DATA.md).
+### B. HTTP API / mutation (Java)
 
-### B. HTTP API and mutation generate (Java)
-
-Requires **Java 21** and Maven 3.8+. Does **not** run the CVAE.
+Java 21+, Maven 3.8+. Does **not** run the CVAE.
 
 ```bash
 cd java
-mvn clean package -DskipTests
-java -jar target/cram-generator-1.0.0.jar validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
-java -jar target/cram-generator-1.0.0.jar features "CC1CCC(CC1)(C(=O)O)C(=O)O"
-java -jar target/cram-generator-1.0.0.jar generate -n 50
+mvn package -DskipTests
 java -jar target/cram-generator-1.0.0.jar smoke -n 40 --seed 42
 java -jar target/cram-generator-1.0.0.jar --server   # http://localhost:8080
 ```
 
-```bash
-curl "http://localhost:8080/api/v1/validate?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
-curl "http://localhost:8080/api/v1/features?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
-curl -X POST http://localhost:8080/api/v1/generate -H "Content-Type: application/json" -d '{"n":20}'
-```
+Full guide: [java/README.md](java/README.md)
 
-Full Java guide: [java/README.md](java/README.md)
+### C. Fast CLI (Julia)
 
-### C. Fast CLI / package (Julia)
-
-Requires **Julia 1.10+**.
+Julia 1.10+.
 
 ```bash
 cd julia
 julia --project=. -e 'using Pkg; Pkg.instantiate()'
-julia --project=. cli.jl validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
-julia --project=. cli.jl generate -n 50 -o generated.csv
 julia --project=. cli.jl smoke -n 40 --seed 42
 ```
 
-Full Julia guide: [julia/README.md](julia/README.md)
+Full guide: [julia/README.md](julia/README.md)
+
+Compare mutation editions (after building the Java JAR):
+
+```bash
+cd python
+python scripts/compare_mutation_smoke.py -n 40 --seed 42
+```
 
 ---
 
-## 3. Python CVAE (trained size)
-
-Production latent space is **64**.
-
-```text
-SMILES → graph (163D atom features)
-       → GAT encoder (hidden 256)
-       → z ~ N(μ, σ²)     64D
-       → condition          32D
-       → GRU SELFIES decoder
-       → SMILES
-```
+## 3. Production CVAE size
 
 | Parameter | Value |
 |-----------|-------|
 | Atom features | 163D |
-| Hidden | 256 |
+| GAT encoder | 3 layers, 4 heads, hidden 256 |
 | **Latent** | **64** |
-| Condition | 32 |
+| Condition | 32D |
+| Decoder | GRU, 2 layers, hidden 256 |
+
+Architecture, feature groups, and REST map: [DESIGN.md](DESIGN.md).
 
 ---
 
-## 4. Mutation smoke (Java / Julia)
-
-Environmentally plausible = structural CRAM **and** Hertkorn van Krevelen window **O/C 0.40–0.60**, **H/C 1.20–1.70**. Mutation is not property-conditioned, so only about **30%** of CRAM-valid outputs are expected in that window (this smoke often lands 30–50%).
-
-The **trained 64D CVAE in `python/` is better** than Java/Julia mutation: it conditions on carboxyl count, ring class, and related properties, samples marine-like formulas without a reject loop, and is **~100× faster**.
-
-Reference seed `CC1CCC(CC1)(C(=O)O)C(=O)O`: O/C **0.44**, H/C **1.56**, MW **186.2 Da** (in-window).
-
-Recorded runs (`--seed 42`, 18 Aug 2026):
-
-| Check | n | Env. plausible | Time |
-|-------|---|----------------|------|
-| Java CLI `smoke` (CDK generate) | 40 | **20/40 = 50%** | **0.05 s** (824 mol/s) |
-| Java JUnit `MutationEnvironmentalSmokeTest` | 40 | 50% | 0.05 s (760 mol/s) |
-| Python `compare_mutation_smoke.py --java-only` (RDKit referee, includes JVM start) | 20 | 16 parseable, 4 invalid valence; **9/16 = 56%** | **0.35 s** wall (57 mol/s) |
-| Julia `cli.jl smoke` / `test/smoke.jl` | 40 | same protocol | run where Julia 1.10+ is installed |
-| Python CVAE (`python/`, 64D checkpoint) | — | **better** (property-conditioned) | **~100× faster** than mutation reject loops |
-
-RDKit may reject a few CDK-accepted mutants (explicit oxygen valence). That is expected for unconstrained SMILES mutation.
-
-```bash
-cd java && mvn test && java -jar target/cram-generator-1.0.0.jar smoke -n 40 --seed 42
-cd julia && julia --project=. cli.jl smoke -n 40 --seed 42
-cd python && python scripts/compare_mutation_smoke.py -n 40 --seed 42
-```
-
----
-
-## 5. Layout
+## 4. Layout
 
 ```text
 Generative_CRAM/
 ├── README.md                 this file
-├── DATA.md                   Google Drive: cram_data, models, Generated_Structures
+├── DESIGN.md                 architecture
+├── DATA.md                   Drive assets
 ├── LICENSE
-├── python/                   CVAE, UI, training, analysis scripts
-│   ├── main.py
-│   ├── src/{models,generators,features,validator,tokenizer,...}
-│   ├── ui/
-│   ├── scripts/
-│   └── README.md
+├── python/                   CVAE, UI, training
 ├── java/                     Spring Boot + CDK
-│   ├── pom.xml
-│   └── src/main/java/com/cram/generator/
 └── julia/                    MolecularGraph.jl
-    ├── Project.toml
-    ├── cli.jl
-    ├── test/smoke.jl
-    └── src/
 ```
 
 ---
