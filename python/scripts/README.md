@@ -13,6 +13,8 @@ Standalone Python utilities (no notebooks).
 | `visualize_*structures.py` | Draw representative molecules |
 | `export_*` | Table / batch-stat export helpers |
 
+Training CSV and checkpoints come from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) (`cram_data`, `models`, `Generated_Structures`). See [DATA.md](../../DATA.md).
+
 Train:
 
 ```bash

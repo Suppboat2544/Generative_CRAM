@@ -12,6 +12,8 @@ Julia implementation of the CRAM (Carboxyl-Rich Alicyclic Molecules) Generator f
 - **Batch Processing**: Process large datasets efficiently
 - **High Performance**: Leverage Julia's speed for computational chemistry
 
+Training SMILES: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing). Full mapping: [DATA.md](../DATA.md).
+
 ## Installation
 
 ### Prerequisites
@@ -249,6 +251,6 @@ If you use this software in your research, please cite:
 
 ## See Also
 
-- [Python edition](../python/README.md) — CVAE, training, Gradio
-- [Java edition](../java/README.md) — Spring Boot REST + CLI
-- [Repository root](../README.md)
+Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/README.md) · [Repository root](../README.md)
+
+SMILES lists for batch jobs: **`cram_data`** on [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) ([DATA.md](../DATA.md)).

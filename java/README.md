@@ -4,6 +4,8 @@ Spring Boot REST API and Picocli for CRAM validation and 163D feature extraction
 
 Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
 
+SMILES tables for batch validation: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) ([DATA.md](../DATA.md)).
+
 ## Requirements
 
 - Java 21+

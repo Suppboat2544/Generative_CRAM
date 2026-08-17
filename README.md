@@ -19,7 +19,7 @@ SMILES  →  CRAM criteria  →  163D features  →  generate / serve
 | [`java/`](java/README.md) | Spring Boot REST API + Picocli | `cd java && mvn spring-boot:run` |
 | [`julia/`](julia/README.md) | MolecularGraph.jl validation, features, mutation | `cd julia && julia cli.jl info` |
 
-Notebooks and trained `.pt` weights are not in this repository.
+Notebooks and large binaries are not in git. Download **data, models, and generated structures** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) — see [DATA.md](DATA.md).
 
 ---
 
@@ -66,6 +66,8 @@ python scripts/train_cvae.py --smiles-csv data/cram_molecules.csv --epochs 50 --
 ```
 
 Full Python guide: [python/README.md](python/README.md)
+
+Place Drive downloads first (`cram_data` → `python/data/`, `models` → `python/models/`). Details: [DATA.md](DATA.md).
 
 ### B. HTTP API (Java)
 
@@ -126,6 +128,7 @@ SMILES → graph (163D atom features)
 ```text
 Generative_CRAM/
 ├── README.md                 this file
+├── DATA.md                   Google Drive: cram_data, models, Generated_Structures
 ├── LICENSE
 ├── python/                   CVAE, UI, training, analysis scripts
 │   ├── main.py

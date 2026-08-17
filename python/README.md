@@ -16,6 +16,8 @@ The trained production model uses a **64-dimensional latent space** (not 128).
 
 Sibling editions: [Java REST/CLI](../java/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
 
+**Assets:** [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) (`cram_data`, `models`, `Generated_Structures`) — copy into `data/`, `models/`, and `outputs/Generated_Structures/` as described in [DATA.md](../DATA.md).
+
 ---
 
 ## Requirements
@@ -28,6 +30,8 @@ GPU (CUDA) is recommended for training. DGL graph training is most reliable on C
 ---
 
 ## Installation
+
+After clone, download Drive assets (see [DATA.md](../DATA.md)), then:
 
 ```bash
 cd python
@@ -153,9 +157,9 @@ python/
 ├── src/features/           163D atom features
 ├── ui/                     Gradio
 ├── scripts/                train_cvae.py, PubChem, figures
-├── data/                   SMILES CSVs (not committed)
-├── models/                 .pt checkpoints (not committed)
-└── outputs/                generation results (not committed)
+├── data/                   from Drive `cram_data` (not committed)
+├── models/                 from Drive `models` (not committed)
+└── outputs/                from Drive `Generated_Structures` (not committed)
 ```
 
 ---

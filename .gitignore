@@ -102,10 +102,14 @@ checkpoints/
 python/data/*.csv
 python/data/*.xlsx
 python/data/*.parquet
-python/outputs/
 !python/data/.gitkeep
-!python/outputs/.gitkeep
+!python/data/README.md
+python/models/*
 !python/models/.gitkeep
+!python/models/README.md
+python/outputs/*
+!python/outputs/.gitkeep
+!python/outputs/README.md
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logs
