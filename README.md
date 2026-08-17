@@ -1,5 +1,7 @@
 # Generative CRAM
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Toolkit for **validating, encoding, and generating Carboxyl-Rich Alicyclic Molecules (CRAM)** — refractory components of marine dissolved organic matter (DOM).
 
 Public libraries under-sample this space. This repo **filters** SMILES against CRAM rules and **generates** new structures. The intended generator is the **trained 64-D Python CVAE**. Java and Julia share the chemistry rules and provide mutation / REST / CLI; they do not load `.pt` checkpoints.
@@ -278,7 +280,9 @@ https://github.com/Suppboat2544/Generative_CRAM
 
 ## License
 
-MIT — [LICENSE](LICENSE)
+**MIT** — [LICENSE](LICENSE). SPDX: `MIT`.
+
+Anyone may use, copy, modify, and distribute this software, including commercially, if they keep the copyright notice. Weights and data stay on Drive ([DATA.md](DATA.md)); they are not covered as git contents.
 
 ## Author
 
