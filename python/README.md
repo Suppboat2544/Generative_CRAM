@@ -14,7 +14,7 @@ The trained production CVAE uses a **64-dimensional latent space**.
 4. Generate molecules with CVAE (checkpoint required) or SELFIES mutation.
 5. Search PubChem for CRAM-like seeds.
 
-Sibling editions: [Java REST/CLI](../java/README.md) (validate, 163D features, mutation generate) · [Julia CLI](../julia/README.md) · [repo root](../README.md). Property-conditioned CVAE training and `.pt` sampling stay here.
+Sibling editions: [Java REST/CLI](../java/README.md) (validate, 163D features, mutation generate) · [Julia CLI](../julia/README.md) · [repo root](../README.md). Property-conditioned CVAE training and `.pt` sampling stay here. Java/Julia mutation is expected at ~30% Hertkorn-window (recorded Java `--seed 42`: 50% CDK, 56% RDKit).
 
 **Assets:** [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) (`cram_data`, `models`, `Generated_Structures`) — copy into `data/`, `models/`, and `outputs/Generated_Structures/` as described in [DATA.md](../DATA.md).
 
@@ -58,6 +58,7 @@ pip install dgl==2.1.0 -f https://data.dgl.ai/wheels/cu121/repo.html
 python main.py validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
 python main.py features "CC1CCC(CC1)(C(=O)O)C(=O)O" --verbose
 python main.py generate --mode mutation --count 100 --output outputs/cram_mutants.csv
+python scripts/compare_mutation_smoke.py -n 40 --seed 42
 python main.py ui --port 7860
 python main.py info
 ```

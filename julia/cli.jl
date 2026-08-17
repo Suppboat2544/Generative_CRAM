@@ -31,7 +31,7 @@ function parse_commandline()
 
     @add_arg_table! s begin
         "command"
-            help = "Command to execute: validate, batch, generate, features, info"
+            help = "Command: validate, batch, generate, features, smoke, info"
             required = true
             
         "args"
@@ -201,6 +201,45 @@ function cmd_features(args, parsed)
     return 0
 end
 
+function cmd_smoke(args, parsed)
+    seed = "CC1CCC(CC1)(C(=O)O)C(=O)O"
+    n = parsed["count"]
+    rng_seed = parsed["seed"] === nothing ? 42 : parsed["seed"]
+
+    println("=== Julia CRAM mutation smoke ===")
+    result = validate_cram(seed)
+    if !result.is_cram || !is_environmentally_plausible(seed)
+        println("smoke FAIL: reference seed is not CRAM / not in Hertkorn window")
+        return 1
+    end
+    println("validate: PASS")
+
+    fv = extract_features(seed)
+    if length(fv.features) != 163
+        println("smoke FAIL: 163D features")
+        return 1
+    end
+    println("features: $(fv.n_atoms) x 163 PASS")
+
+    config = GenerationConfig(
+        n_molecules = n,
+        mutation_rate = parsed["mutation-rate"],
+        max_attempts = parsed["max-attempts"],
+        seed = rng_seed,
+        validate = true,
+    )
+    mols = generate_cram(n=n, config=config)
+    env = count(is_environmentally_plausible, mols)
+    println("generate: $(length(mols)) CRAM-valid")
+    println(summarize_env(env, length(mols)))
+    if length(mols) < 10
+        println("smoke FAIL: too few CRAM-valid mutants")
+        return 1
+    end
+    println("smoke: PASS (expected ~$(EXPECTED_ENV_PERCENT)% environmentally plausible)")
+    return 0
+end
+
 function cmd_info(args, parsed)
     cram_info()
     return 0
@@ -221,11 +260,13 @@ function main()
         cmd_generate(args, parsed)
     elseif command == "features"
         cmd_features(args, parsed)
+    elseif command == "smoke"
+        cmd_smoke(args, parsed)
     elseif command == "info"
         cmd_info(args, parsed)
     else
         println("❌ Unknown command: $command")
-        println("Available commands: validate, batch, generate, features, info")
+        println("Available commands: validate, batch, generate, features, smoke, info")
         1
     end
     

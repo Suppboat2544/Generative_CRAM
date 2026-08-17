@@ -1,6 +1,7 @@
 package com.cram.generator;
 
 import com.cram.generator.service.CramValidator;
+import com.cram.generator.service.EnvironmentalPlausibility;
 import com.cram.generator.service.FeatureExtractor;
 import com.cram.generator.service.MutationGenerator;
 import com.cram.generator.model.ValidationResult;
@@ -25,6 +26,7 @@ import java.util.concurrent.Callable;
         CramCli.BatchCommand.class,
         CramCli.FeaturesCommand.class,
         CramCli.GenerateCommand.class,
+        CramCli.SmokeCommand.class,
         CramCli.InfoCommand.class
     }
 )
@@ -216,12 +218,18 @@ public class CramCli implements Callable<Integer> {
         @Option(names = {"--max-attempts"}, description = "Maximum mutation attempts", defaultValue = "5000")
         private int maxAttempts;
 
+        @Option(names = {"--seed"}, description = "Random seed")
+        private Long seed;
+
         @Option(names = {"-o", "--output"}, description = "Output CSV file")
         private File outputFile;
 
         @Override
         public Integer call() {
-            MutationGenerator generator = new MutationGenerator(new CramValidator());
+            CramValidator validator = new CramValidator();
+            MutationGenerator generator = seed == null
+                    ? new MutationGenerator(validator)
+                    : new MutationGenerator(validator, seed);
             var smiles = generator.generate(count, maxAttempts);
             System.out.printf("Generated %d CRAM molecules (mutation / CDK)%n", smiles.size());
             if (outputFile != null) {
@@ -240,6 +248,53 @@ public class CramCli implements Callable<Integer> {
                     System.out.println(s);
                 }
             }
+            return 0;
+        }
+    }
+
+    @Command(name = "smoke", description = "Validate, features, generate; report ~30% environmental rate")
+    static class SmokeCommand implements Callable<Integer> {
+
+        @Option(names = {"-n", "--count"}, description = "Molecules to generate", defaultValue = "40")
+        private int count;
+
+        @Option(names = {"--seed"}, description = "Random seed", defaultValue = "42")
+        private long seed;
+
+        @Override
+        public Integer call() {
+            final String seedSmiles = "CC1CCC(CC1)(C(=O)O)C(=O)O";
+            CramValidator validator = new CramValidator();
+            ValidationResult seedResult = validator.validate(seedSmiles);
+            if (!seedResult.isValid() || !EnvironmentalPlausibility.isPlausible(seedResult)) {
+                System.err.println("smoke FAIL: reference seed is not CRAM / not in Hertkorn window");
+                return 1;
+            }
+            System.out.println("validate: PASS");
+
+            FeatureExtractor extractor = new FeatureExtractor();
+            double[][] atom = extractor.extractFeatures(seedSmiles);
+            if (atom.length == 0 || atom[0].length != FeatureExtractor.FEATURE_DIM) {
+                System.err.println("smoke FAIL: 163D features");
+                return 1;
+            }
+            System.out.printf("features: %d x %d PASS%n", atom.length, FeatureExtractor.FEATURE_DIM);
+
+            MutationGenerator generator = new MutationGenerator(validator, seed);
+            var smiles = generator.generate(count, 8000);
+            int env = 0;
+            for (String s : smiles) {
+                if (EnvironmentalPlausibility.isPlausible(validator.validate(s))) {
+                    env++;
+                }
+            }
+            System.out.printf("generate: %d CRAM-valid%n", smiles.size());
+            System.out.print(EnvironmentalPlausibility.summarize(env, smiles.size()));
+            if (smiles.size() < 10) {
+                System.err.println("smoke FAIL: too few CRAM-valid mutants");
+                return 1;
+            }
+            System.out.println("smoke: PASS");
             return 0;
         }
     }
@@ -273,7 +328,8 @@ public class CramCli implements Callable<Integer> {
                 Example valid CRAM: CC1CCC(CC1)(C(=O)O)C(=O)O
 
                 Java edition: validate, 163D features, mutation generate.
-                Property-conditioned CVAE training and sampling stay in python/.
+                Mutation typically passes only ~30% environmentally plausible
+                (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). CVAE stays in python/.
                 
                 """);
             return 0;

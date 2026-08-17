@@ -112,7 +112,7 @@ public class CramController {
         return ResponseEntity.ok(new GenerateResponse(
                 smiles.size(),
                 "mutation",
-                "CVAE sampling is Python-only",
+                "CVAE sampling is Python-only; mutation typically ~30% environmentally plausible",
                 smiles
         ));
     }

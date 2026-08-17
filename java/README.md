@@ -3,6 +3,11 @@
 Validate CRAM molecules, extract 163D CDK features, and **mutation-generate** SMILES.  
 The property-conditioned **CVAE is Python-only** (`python/`).
 
+Mutation is CRAM-valid by construction but typically only **~30% environmentally plausible**
+(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Recorded `--seed 42`: Java CLI **20/40 = 50%** (CDK);
+RDKit comparison **9/16 = 56%** in-window (4/20 unparseable). CVAE stays in `python/`.
+Compare with Julia via `python/scripts/compare_mutation_smoke.py`.
+
 Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
 
 SMILES tables for batch validation: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) ([DATA.md](../DATA.md)).
@@ -32,6 +37,10 @@ java -jar target/cram-generator-1.0.0.jar features "CC1CCC(CC1)(C(=O)O)C(=O)O" -
 
 # Mutation generate (not CVAE)
 java -jar target/cram-generator-1.0.0.jar generate -n 50 -o generated.csv
+
+# Smoke: validate + 163D features + generate; reports ~30% Hertkorn window
+java -jar target/cram-generator-1.0.0.jar smoke -n 40 --seed 42
+mvn test
 
 # Batch validation
 java -jar target/cram-generator-1.0.0.jar batch input.txt -o results.csv

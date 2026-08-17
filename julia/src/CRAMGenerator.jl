@@ -48,6 +48,8 @@ export extract_features, FeatureVector
 export generate_cram, mutate_smiles
 export batch_validate, batch_generate
 export cram_info
+export is_environmentally_plausible, elemental_ratios, in_env_window, summarize_env
+export ENV_OC_MIN, ENV_OC_MAX, ENV_HC_MIN, ENV_HC_MAX, EXPECTED_ENV_PERCENT, ENV_NOTE
 export CRAM_CRITERIA, RING_CLASSES, RING_SIZE_CLASSES
 export NUM_RING_CLASSES, NUM_RING_SIZE_CLASSES
 export normalize_mw, normalize_dbe_c, normalize_dbe_o, normalize_dbe_h
@@ -58,5 +60,6 @@ include("validator.jl")
 include("features.jl")
 include("generator.jl")
 include("utils.jl")
+include("environmental.jl")
 
 end # module

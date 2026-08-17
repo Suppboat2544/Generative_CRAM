@@ -62,6 +62,16 @@ public class CramCriteria {
     public static final int[] ALLOWED_ATOMS = {6, 1, 8, 7, 16, 9, 17, 35, 53}; // C, H, O, N, S, F, Cl, Br, I
 
     /**
+     * Hertkorn marine CRAM van Krevelen window (environmentally plausible).
+     * Structural CRAM-valid mutants typically land here only ~30% of the time.
+     */
+    public static final double ENV_OC_MIN = 0.40;
+    public static final double ENV_OC_MAX = 0.60;
+    public static final double ENV_HC_MIN = 1.20;
+    public static final double ENV_HC_MAX = 1.70;
+    public static final int EXPECTED_ENV_PERCENT = 30;
+
+    /**
      * Ring class name to index mapping.
      */
     public static final Map<String, Integer> RING_CLASS_TO_IDX = Map.of(

@@ -68,6 +68,9 @@ public class CramValidator {
             // Parse SMILES
             IAtomContainer molecule = smilesParser.parseSmiles(smiles.trim());
             AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
+            org.openscience.cdk.tools.CDKHydrogenAdder
+                    .getInstance(DefaultChemObjectBuilder.getInstance())
+                    .addImplicitHydrogens(molecule);
             
             // Generate canonical SMILES
             String canonical = smilesGenerator.create(molecule);
@@ -241,11 +244,19 @@ public class CramValidator {
         int hCount = 0, cCount = 0, oCount = 0, nCount = 0;
         
         for (IAtom atom : molecule.atoms()) {
-            switch (atom.getAtomicNumber()) {
+            Integer atomicNum = atom.getAtomicNumber();
+            if (atomicNum == null) {
+                continue;
+            }
+            switch (atomicNum) {
                 case 1 -> hCount++;
                 case 6 -> cCount++;
                 case 8 -> oCount++;
                 case 7 -> nCount++;
+            }
+            Integer implicitH = atom.getImplicitHydrogenCount();
+            if (implicitH != null) {
+                hCount += implicitH;
             }
         }
         

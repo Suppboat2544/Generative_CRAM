@@ -9,6 +9,7 @@ import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,10 +44,20 @@ public class MutationGenerator {
     private final CramValidator validator;
     private final SmilesParser smilesParser;
     private final SmilesGenerator smilesGenerator;
-    private final Random random = new Random();
+    private final Random random;
 
+    @Autowired
     public MutationGenerator(CramValidator validator) {
+        this(validator, new Random());
+    }
+
+    public MutationGenerator(CramValidator validator, long seed) {
+        this(validator, new Random(seed));
+    }
+
+    private MutationGenerator(CramValidator validator, Random random) {
         this.validator = validator;
+        this.random = random;
         this.smilesParser = new SmilesParser(DefaultChemObjectBuilder.getInstance());
         this.smilesGenerator = new SmilesGenerator(SmiFlavor.Canonical);
     }

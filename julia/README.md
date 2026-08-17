@@ -12,6 +12,16 @@ Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/
 - **Mutation generation** (SMILES edits, not SELFIES and not CVAE)
 - **Batch processing**
 
+Mutation is CRAM-valid by construction but typically only **~30% environmentally plausible**
+(Hertkorn O/C 0.40–0.60, H/C 1.20–1.70). Java `--seed 42` recorded **50%** (CDK) / **56%** (RDKit).
+Compare with Java:
+
+```bash
+cd julia
+julia --project=. cli.jl smoke -n 40 --seed 42
+julia --project=. test/smoke.jl
+```
+
 Training SMILES: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing). Full mapping: [DATA.md](../DATA.md).
 
 ## Installation
@@ -89,6 +99,9 @@ julia cli.jl generate -n 100 -o generated.csv
 
 # Generate with custom parameters
 julia cli.jl generate -n 50 -m 0.4 --max-attempts 5000
+
+# Smoke: ~30% environmentally plausible (Hertkorn window)
+julia cli.jl smoke -n 40 --seed 42
 
 # Extract features
 julia cli.jl features "CC1CCC(CC1)(C(=O)O)C(=O)O" -v
