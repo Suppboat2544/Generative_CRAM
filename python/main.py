@@ -86,42 +86,73 @@ def generate_command(args):
 
         print(f"\nLoading CVAE checkpoint: {args.checkpoint}")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        ckpt = torch.load(args.checkpoint, map_location=device)
+        ckpt = torch.load(args.checkpoint, map_location=device, weights_only=False)
         state = ckpt.get("model_state_dict", ckpt)
         vocab = ckpt.get("selfies_vocab") or ckpt.get("vocab")
         idx_to_token = ckpt.get("idx_to_token")
         if idx_to_token is None and vocab:
             idx_to_token = {int(v): k for k, v in vocab.items()}
+        elif idx_to_token:
+            idx_to_token = {int(k): v for k, v in idx_to_token.items()}
         vocab_size = ckpt.get("vocab_size", len(vocab) if vocab else None)
         latent_dim = ckpt.get("latent_dim", 64)
+        hidden_dim = ckpt.get("hidden_dim", 256)
+        if vocab_size is None and "output_proj.weight" in state:
+            vocab_size = int(state["output_proj.weight"].shape[0])
         if vocab_size is None:
             print("Checkpoint is missing vocab_size / selfies_vocab")
             return
 
-        model = create_cvae_model(
-            vocab_size=vocab_size,
-            latent_dim=latent_dim,
-            hidden_dim=ckpt.get("hidden_dim", 256),
-            condition_dim=ckpt.get("condition_dim", 32),
-            max_len=ckpt.get("max_len", 150),
-        )
-        model.load_state_dict(state)
-        model = model.to(device)
-        model.eval()
-        print(f"Loaded model with latent_dim={latent_dim}")
+        if "decoder_embedding.weight" in state:
+            from src.models.deep_cram_vae import DeepCRAMDecoderVAE, training_style_vocab
 
-        generator = FastPropertyConditionedGenerator(
-            model=model,
-            selfies_vocab=vocab,
-            idx_to_token=idx_to_token,
-            device=device,
-        )
-        smiles = generator.generate_fast(
-            n=args.count,
-            n_cooh=args.n_cooh,
-            ring_class=args.ring_class,
-            temperature=args.temperature,
-        )
+            if vocab:
+                aligned = training_style_vocab(vocab.keys(), vocab_size)
+            else:
+                aligned = training_style_vocab([], vocab_size)
+            vocab = aligned
+            idx_to_token = {i: t for t, i in vocab.items()}
+            model = DeepCRAMDecoderVAE(
+                vocab_size=vocab_size,
+                latent_dim=int(state["latent_proj.weight"].shape[1]) if "latent_proj.weight" in state else latent_dim,
+                hidden_dim=hidden_dim,
+                max_len=int(state["decoder_pos_encoding"].shape[0]) if "decoder_pos_encoding" in state else 150,
+            )
+            model.load_state_dict(state, strict=False)
+            model = model.to(device)
+            model.eval()
+            print(f"Loaded Transformer CVAE (decoder-only) latent_dim={model.latent_dim} vocab={vocab_size}")
+            smiles = model.sample_smiles(
+                idx_to_token=idx_to_token,
+                n=args.count,
+                temperature=args.temperature,
+                max_length=min(ckpt.get("max_len", 100), model.max_len),
+            )
+        else:
+            model = create_cvae_model(
+                vocab_size=vocab_size,
+                latent_dim=latent_dim,
+                hidden_dim=hidden_dim,
+                condition_dim=ckpt.get("condition_dim", 32),
+                max_len=ckpt.get("max_len", 150),
+            )
+            model.load_state_dict(state)
+            model = model.to(device)
+            model.eval()
+            print(f"Loaded model with latent_dim={latent_dim}")
+
+            generator = FastPropertyConditionedGenerator(
+                model=model,
+                selfies_vocab=vocab,
+                idx_to_token=idx_to_token,
+                device=device,
+            )
+            smiles = generator.generate_fast(
+                n=args.count,
+                n_cooh=args.n_cooh,
+                ring_class=args.ring_class,
+                temperature=args.temperature,
+            )
         results = [{"smiles": s, "method": "cvae"} for s in smiles]
     else:
         generator = SELFIESMutationGenerator(seed_smiles=seeds)

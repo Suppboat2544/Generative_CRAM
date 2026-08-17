@@ -45,12 +45,13 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-CUDA 12.1:
+CUDA: keep the PyTorch build that matches the GPU (Colab: do **not** `pip install torch==2.2.1`). Then install a DGL wheel for that CUDA:
 
 ```bash
-pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cu121
-pip install dgl==2.1.0 -f https://data.dgl.ai/wheels/cu121/repo.html
+pip install dgl -f https://data.dgl.ai/wheels/torch-2.4/cu121/repo.html
 ```
+
+If the DGL GAT probe fails, reinstall DGL for the installed `torch.version.cuda`. Use CPU only if you set that intentionally.
 
 ---
 
@@ -80,7 +81,11 @@ Train:
 python scripts/train_cvae.py \
   --smiles-csv data/cram_molecules.csv \
   --epochs 50 --latent-dim 64 \
-  --output-dir models/cvae_run
+  --n-cycles 4 --output-dir models/cvae_run
+python scripts/paper_blocking_criticals.py \
+  --checkpoint models/cvae_best.pt \
+  --smiles-csv data/cram_molecules.csv \
+  --out-dir outputs/paper_blocking
 ```
 
 PubChem harvest:

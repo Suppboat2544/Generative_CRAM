@@ -103,7 +103,7 @@ Vocabulary size is **4 + unique SELFIES tokens** from the training CSV (saved wi
 
 Property embeddings: `n_cooh` 7×8, ring class 6×16, ring-size class 3×4, plus 7 continuous values (aliphatic %, MW, benzene, DBE/C, DBE/O, DBE/H, mean ring size).
 
-Training: `python/scripts/train_cvae.py --latent-dim 64`. Sampling: `python main.py generate --mode vae --checkpoint models/<file>.pt`. Weights are **not** in git — [DATA.md](DATA.md).
+Training: `python/scripts/train_cvae.py --latent-dim 64` writes `cvae_best.pt` plus `{stem}_meta.json` (`vocab_size`). Dual-z / collapse / funnel: `python/scripts/paper_blocking_criticals.py` (encoder μ ∈ ℝ⁶⁴ vs Morgan residual PCA `latent_vectors_128d.npz`, **not** VAE z). Sampling: `python main.py generate --mode vae --checkpoint models/<file>.pt`. Weights are **not** in git — [DATA.md](DATA.md). Transformer `best_cram_model.pt` (`decoder_embedding.weight`) is a different model.
 
 ### 163D atom features
 
@@ -181,7 +181,7 @@ Generative_CRAM/
 │   ├── src/features/         163D
 │   ├── src/validator.py
 │   ├── ui/                   Gradio
-│   └── scripts/              train_cvae.py, compare_mutation_smoke.py
+│   └── scripts/              train_cvae.py, paper_blocking_criticals.py, compare_mutation_smoke.py
 ├── java/                     CDK + Spring + Picocli
 │   └── src/test/.../MutationEnvironmentalSmokeTest.java
 └── julia/                    MolecularGraph.jl

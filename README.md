@@ -33,7 +33,7 @@ SMILES  →  CRAM criteria  →  163D atom features  →  generate / serve
 
 The **trained CVAE is better** than Java/Julia mutation: it is property-conditioned, samples marine-like CRAM without a SMILES reject loop, and is **~100× faster**. Mutation is CRAM-valid by construction but typically only **~30% environmentally plausible** (Hertkorn O/C 0.40–0.60, H/C 1.20–1.70).
 
-Notebooks and large binaries are not in git.
+Notebooks and large binaries are not in git. Colab work is mirrored in `python/` (`train_cvae.py`, `paper_blocking_criticals.py`).
 
 ---
 
@@ -198,6 +198,7 @@ python main.py generate --mode mutation --count 100 --output outputs/cram_mutant
 python main.py ui --port 7860
 python scripts/train_cvae.py --smiles-csv data/cram_molecules.csv --epochs 50 --latent-dim 64
 python scripts/compare_mutation_smoke.py -n 40 --seed 42
+python scripts/paper_blocking_criticals.py --checkpoint models/cvae_best.pt --smiles-csv data/cram_molecules.csv --out-dir outputs/paper_blocking
 ```
 
 Needs Python 3.9–3.11, PyTorch 2.x, DGL, RDKit, SELFIES. GPU is recommended for training; DGL is more stable on CPU or CUDA than MPS.
