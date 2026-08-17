@@ -1,0 +1,83 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# CRAM Generator - GPU Dockerfile
+# ══════════════════════════════════════════════════════════════════════════════
+# CUDA-enabled build for GPU acceleration (NVIDIA GPUs)
+#
+# BUILD:
+#   docker build -f Dockerfile.gpu -t cram-generator:gpu .
+#
+# RUN:
+#   docker run --gpus all -p 7860:7860 cram-generator:gpu
+# ══════════════════════════════════════════════════════════════════════════════
+
+FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
+
+# Metadata
+LABEL maintainer="CRAM Generator Team" \
+      version="1.0.0" \
+      description="CRAM Molecule Generator - GPU Version"
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app \
+    DGL_BACKEND=pytorch \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.10 \
+    python3-pip \
+    python3.10-venv \
+    libxrender1 \
+    libxext6 \
+    libsm6 \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create symlinks
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install PyTorch with CUDA support
+RUN pip install torch==2.2.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Install NumPy (compatible version)
+RUN pip install numpy==1.26.4
+
+# Install DGL with CUDA
+RUN pip install dgl -f https://data.dgl.ai/wheels/cu121/repo.html && \
+    pip install dgllife
+
+# Copy and install requirements
+COPY requirements.txt .
+RUN pip install -r requirements.txt || true
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash cram
+USER cram
+WORKDIR /app
+
+# Copy application code
+COPY --chown=cram:cram . .
+
+# Create directories
+RUN mkdir -p /app/outputs /app/data /app/models
+
+# Expose ports
+EXPOSE 7860 8888
+
+# Health check using curl
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:7860/ || exit 1
+
+# Default command
+CMD ["python", "ui/app.py", "--port", "7860"]

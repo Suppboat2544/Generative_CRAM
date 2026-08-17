@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generative-cram"
+version = "1.0.0"
+description = "Property-conditioned deep generation of carboxyl-rich alicyclic molecules (CRAM)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Klabklaydee Supaporn", email = "klabklaydee.s.aa@m.titech.ac.jp" }
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/Suppboat2544/Generative_CRAM"
+Repository = "https://github.com/Suppboat2544/Generative_CRAM"
+
+[project.scripts]
+cram-generate = "main:main"

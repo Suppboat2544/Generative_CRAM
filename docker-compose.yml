@@ -1,0 +1,86 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# CRAM Generator - Docker Compose
+# ══════════════════════════════════════════════════════════════════════════════
+# Easy deployment with docker-compose up
+# ══════════════════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Main CRAM Generator Application
+  # ─────────────────────────────────────────────────────────────────────────────
+  cram-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cram-generator:latest
+    container_name: cram-generator
+    ports:
+      - "7860:7860"  # Gradio UI
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./models:/app/models
+    environment:
+      - PYTHONPATH=/app
+      - DGL_BACKEND=pytorch
+      - CUDA_VISIBLE_DEVICES=0  # GPU support
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+  
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GPU-enabled version (NVIDIA)
+  # ─────────────────────────────────────────────────────────────────────────────
+  cram-generator-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: cram-generator:gpu
+    container_name: cram-generator-gpu
+    runtime: nvidia
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./models:/app/models
+    environment:
+      - PYTHONPATH=/app
+      - DGL_BACKEND=pytorch
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - gpu  # Only start with: docker-compose --profile gpu up
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Named volumes for data persistence
+# ─────────────────────────────────────────────────────────────────────────────
+volumes:
+  cram-data:
+  cram-outputs:
+  cram-models:
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Networks
+# ─────────────────────────────────────────────────────────────────────────────
+networks:
+  default:
+    name: cram-network

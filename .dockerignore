@@ -1,0 +1,82 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Docker Ignore File
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints
+notebooks/
+
+# Large files
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Outputs (mount as volume instead)
+outputs/
+data/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

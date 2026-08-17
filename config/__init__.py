@@ -1,0 +1,40 @@
+"""
+CRAM Generator Configuration Package
+======================================
+"""
+
+from config.settings import (
+    BASE_DIR,
+    DATA_DIR,
+    MODELS_DIR,
+    OUTPUT_DIR,
+    RANDOM_SEED,
+    DEVICE,
+    ENCODER_CONFIG,
+    DECODER_CONFIG,
+    CRAM_VALIDATION,
+    CRAM_SMARTS_PATTERNS,
+    GENERATION_CONFIG,
+    BLOOM_FILTER_CONFIG,
+    VISUALIZATION_CONFIG,
+    MAX_SELFIES_LEN,
+    SPECIAL_TOKENS,
+)
+
+__all__ = [
+    "BASE_DIR",
+    "DATA_DIR",
+    "MODELS_DIR",
+    "OUTPUT_DIR",
+    "RANDOM_SEED",
+    "DEVICE",
+    "ENCODER_CONFIG",
+    "DECODER_CONFIG",
+    "CRAM_VALIDATION",
+    "CRAM_SMARTS_PATTERNS",
+    "GENERATION_CONFIG",
+    "BLOOM_FILTER_CONFIG",
+    "VISUALIZATION_CONFIG",
+    "MAX_SELFIES_LEN",
+    "SPECIAL_TOKENS",
+]
