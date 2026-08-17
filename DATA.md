@@ -47,4 +47,4 @@ python scripts/train_cvae.py --smiles-csv data/cram_molecules.csv --latent-dim 6
 python main.py generate --mode vae --checkpoint models/<checkpoint>.pt --count 100
 ```
 
-Java and Julia only need SMILES lists from `cram_data` (batch validate). They do not load the PyTorch checkpoints.
+Java and Julia use SMILES from `cram_data` for validate, 163D features, and mutation generate. They do not load PyTorch checkpoints. The property-conditioned CVAE stays in `python/`.

@@ -1,6 +1,7 @@
 # Java edition
 
-Spring Boot REST API and Picocli for CRAM validation and 163D feature extraction (CDK).
+Validate CRAM molecules, extract 163D CDK features, and **mutation-generate** SMILES.  
+The property-conditioned **CVAE is Python-only** (`python/`).
 
 Sibling editions: [Python CVAE](../python/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
 
@@ -8,7 +9,7 @@ SMILES tables for batch validation: download **`cram_data`** from [Google Drive]
 
 ## Requirements
 
-- Java 21+
+- Java 21+ (tested with Temurin 25)
 - Maven 3.8+
 
 ## Quick Start
@@ -25,6 +26,12 @@ mvn clean package -DskipTests
 ```bash
 # Validate a molecule
 java -jar target/cram-generator-1.0.0.jar validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
+
+# 163D features
+java -jar target/cram-generator-1.0.0.jar features "CC1CCC(CC1)(C(=O)O)C(=O)O" -v
+
+# Mutation generate (not CVAE)
+java -jar target/cram-generator-1.0.0.jar generate -n 50 -o generated.csv
 
 # Batch validation
 java -jar target/cram-generator-1.0.0.jar batch input.txt -o results.csv
@@ -51,7 +58,9 @@ Server runs at `http://localhost:8080`
 | GET | `/api/v1/validate?smiles=...` | Validate single SMILES |
 | POST | `/api/v1/validate` | Validate SMILES (JSON body) |
 | POST | `/api/v1/validate/batch` | Batch validation |
-| GET | `/api/v1/criteria` | Get CRAM criteria info |
+| GET | `/api/v1/features?smiles=...` | 163D molecule-level features |
+| POST | `/api/v1/generate` | Mutation generate (`{"n":50}`) |
+| GET | `/api/v1/criteria` | CRAM criteria |
 
 ### Example Requests
 
@@ -59,10 +68,10 @@ Server runs at `http://localhost:8080`
 # Validate molecule
 curl "http://localhost:8080/api/v1/validate?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
 
-# Batch validation
-curl -X POST http://localhost:8080/api/v1/validate/batch \
+curl "http://localhost:8080/api/v1/features?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
+curl -X POST http://localhost:8080/api/v1/generate \
   -H "Content-Type: application/json" \
-  -d '{"smilesList": ["CC(=O)O", "CC1CCC(CC1)(C(=O)O)C(=O)O"]}'
+  -d '{"n": 20}'
 ```
 
 ### Example Response
@@ -101,7 +110,8 @@ java/
 │   │   └── CramCriteria.java           # CRAM criteria constants
 │   ├── service/
 │   │   ├── CramValidator.java          # Validation logic
-│   │   └── FeatureExtractor.java       # 163D feature extraction
+│   │   ├── FeatureExtractor.java       # 163D CDK features
+│   │   └── MutationGenerator.java      # SMILES mutation (not CVAE)
 │   └── controller/
 │       └── CramController.java         # REST API endpoints
 └── src/main/resources/

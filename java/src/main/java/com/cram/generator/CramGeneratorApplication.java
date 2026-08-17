@@ -37,8 +37,9 @@ public class CramGeneratorApplication implements CommandLineRunner {
                 ║           🧬 CRAM Generator - Java Edition                ║
                 ║     Deep Learning Toolkit for Marine DOM Molecules        ║
                 ╠═══════════════════════════════════════════════════════════╣
-                ║  REST API running at: http://localhost:8080               ║
-                ║  Swagger UI: http://localhost:8080/swagger-ui.html        ║
+                ║  REST API: http://localhost:8080                          ║
+                ║  validate / features / mutation generate                  ║
+                ║  CVAE training and sampling: python/ edition              ║
                 ╚═══════════════════════════════════════════════════════════╝
                 
                 """);

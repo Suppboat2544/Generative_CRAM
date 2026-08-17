@@ -1,16 +1,16 @@
-# CRAM Generator - Julia Edition
+# Julia edition
 
-🧬 **Deep Learning Toolkit for Marine Dissolved Organic Matter Molecules**
+Validate CRAM molecules, extract 163D features, and **mutation-generate** SMILES
+(MolecularGraph.jl). This is not the Python CVAE.
 
-Julia implementation of the CRAM (Carboxyl-Rich Alicyclic Molecules) Generator for computational chemistry and marine science research.
+Sibling editions: [Python CVAE](../python/README.md) · [Java REST/CLI](../java/README.md) · [repo root](../README.md)
 
 ## Features
 
-- **SMILES Validation**: Validate molecules against CRAM structural criteria
-- **163D Feature Extraction**: Comprehensive molecular feature vectors
-- **Molecule Generation**: Mutation-based CRAM molecule generation
-- **Batch Processing**: Process large datasets efficiently
-- **High Performance**: Leverage Julia's speed for computational chemistry
+- **SMILES validation** against CRAM structural criteria
+- **163D feature extraction**
+- **Mutation generation** (SMILES edits, not SELFIES and not CVAE)
+- **Batch processing**
 
 Training SMILES: download **`cram_data`** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing). Full mapping: [DATA.md](../DATA.md).
 

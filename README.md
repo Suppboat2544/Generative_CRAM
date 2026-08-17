@@ -15,9 +15,11 @@ SMILES  →  CRAM criteria  →  163D features  →  generate / serve
 
 | Folder | Role | Typical command |
 |--------|------|-----------------|
-| [`python/`](python/README.md) | Property-conditioned CVAE (64D latent), Gradio UI, training | `cd python && python main.py validate "..."` |
-| [`java/`](java/README.md) | Spring Boot REST API + Picocli | `cd java && mvn spring-boot:run` |
-| [`julia/`](julia/README.md) | MolecularGraph.jl validation, features, mutation | `cd julia && julia cli.jl info` |
+| [`python/`](python/README.md) | **CVAE** (64D latent), Gradio, training | `cd python && python main.py generate --mode vae ...` |
+| [`java/`](java/README.md) | Validate, 163D features, **mutation** generate, REST | `cd java && java -jar ... generate -n 50` |
+| [`julia/`](julia/README.md) | Validate, 163D features, **mutation** generate | `cd julia && julia cli.jl generate -n 50` |
+
+The deep generator (GAT encoder → 64D latent → SELFIES decoder) lives only in **Python**. Java and Julia do not load `.pt` checkpoints.
 
 Notebooks and large binaries are not in git. Download **data, models, and generated structures** from [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) — see [DATA.md](DATA.md).
 
@@ -69,19 +71,23 @@ Full Python guide: [python/README.md](python/README.md)
 
 Place Drive downloads first (`cram_data` → `python/data/`, `models` → `python/models/`). Details: [DATA.md](DATA.md).
 
-### B. HTTP API (Java)
+### B. HTTP API and mutation generate (Java)
 
-Requires **Java 21** and Maven 3.8+.
+Requires **Java 21** and Maven 3.8+. Does **not** run the CVAE.
 
 ```bash
 cd java
 mvn clean package -DskipTests
 java -jar target/cram-generator-1.0.0.jar validate "CC1CCC(CC1)(C(=O)O)C(=O)O"
+java -jar target/cram-generator-1.0.0.jar features "CC1CCC(CC1)(C(=O)O)C(=O)O"
+java -jar target/cram-generator-1.0.0.jar generate -n 50
 java -jar target/cram-generator-1.0.0.jar --server   # http://localhost:8080
 ```
 
 ```bash
 curl "http://localhost:8080/api/v1/validate?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
+curl "http://localhost:8080/api/v1/features?smiles=CC1CCC(CC1)(C(=O)O)C(=O)O"
+curl -X POST http://localhost:8080/api/v1/generate -H "Content-Type: application/json" -d '{"n":20}'
 ```
 
 Full Java guide: [java/README.md](java/README.md)

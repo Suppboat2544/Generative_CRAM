@@ -1,6 +1,8 @@
 package com.cram.generator;
 
 import com.cram.generator.service.CramValidator;
+import com.cram.generator.service.FeatureExtractor;
+import com.cram.generator.service.MutationGenerator;
 import com.cram.generator.model.ValidationResult;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -17,10 +19,12 @@ import java.util.concurrent.Callable;
     name = "cram",
     mixinStandardHelpOptions = true,
     version = "CRAM Generator 1.0.0",
-    description = "Deep Learning Toolkit for CRAM Molecule Generation",
+    description = "CRAM validation, 163D features, and mutation-based generation (CVAE is Python-only)",
     subcommands = {
         CramCli.ValidateCommand.class,
         CramCli.BatchCommand.class,
+        CramCli.FeaturesCommand.class,
+        CramCli.GenerateCommand.class,
         CramCli.InfoCommand.class
     }
 )
@@ -170,6 +174,76 @@ public class CramCli implements Callable<Integer> {
         }
     }
 
+    @Command(name = "features", description = "Extract 163D atom features from a SMILES string")
+    static class FeaturesCommand implements Callable<Integer> {
+
+        @Parameters(index = "0", description = "SMILES string")
+        private String smiles;
+
+        @Option(names = {"-v", "--verbose"}, description = "Print molecule-level mean vector")
+        private boolean verbose;
+
+        @Override
+        public Integer call() {
+            FeatureExtractor extractor = new FeatureExtractor();
+            double[][] atom = extractor.extractFeatures(smiles);
+            if (atom.length == 0) {
+                System.err.println("Could not extract features (invalid SMILES).");
+                return 1;
+            }
+            System.out.println("SMILES: " + smiles);
+            System.out.printf("Atoms: %d%n", atom.length);
+            System.out.printf("Atom features: %d x %d%n", atom.length, FeatureExtractor.FEATURE_DIM);
+            System.out.printf("Non-zero values: %d%n", extractor.countNonZero(atom));
+            if (verbose) {
+                double[] mean = extractor.extractMoleculeFeatures(smiles);
+                System.out.print("Molecule mean (first 16 dims):");
+                for (int i = 0; i < 16 && i < mean.length; i++) {
+                    System.out.printf(" %.3f", mean[i]);
+                }
+                System.out.println();
+            }
+            return 0;
+        }
+    }
+
+    @Command(name = "generate", description = "Mutation-based CRAM generation (not the Python CVAE)")
+    static class GenerateCommand implements Callable<Integer> {
+
+        @Option(names = {"-n", "--count"}, description = "Number of molecules", defaultValue = "20")
+        private int count;
+
+        @Option(names = {"--max-attempts"}, description = "Maximum mutation attempts", defaultValue = "5000")
+        private int maxAttempts;
+
+        @Option(names = {"-o", "--output"}, description = "Output CSV file")
+        private File outputFile;
+
+        @Override
+        public Integer call() {
+            MutationGenerator generator = new MutationGenerator(new CramValidator());
+            var smiles = generator.generate(count, maxAttempts);
+            System.out.printf("Generated %d CRAM molecules (mutation / CDK)%n", smiles.size());
+            if (outputFile != null) {
+                try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
+                    writer.println("smiles");
+                    for (String s : smiles) {
+                        writer.println(s);
+                    }
+                    System.out.printf("Saved %s%n", outputFile.getAbsolutePath());
+                } catch (IOException e) {
+                    System.err.println("Error: " + e.getMessage());
+                    return 1;
+                }
+            } else {
+                for (String s : smiles) {
+                    System.out.println(s);
+                }
+            }
+            return 0;
+        }
+    }
+
     /**
      * Show CRAM criteria information.
      */
@@ -197,6 +271,9 @@ public class CramCli implements Callable<Integer> {
                 └───────────────────────────────────────────────────────────┘
                 
                 Example valid CRAM: CC1CCC(CC1)(C(=O)O)C(=O)O
+
+                Java edition: validate, 163D features, mutation generate.
+                Property-conditioned CVAE training and sampling stay in python/.
                 
                 """);
             return 0;

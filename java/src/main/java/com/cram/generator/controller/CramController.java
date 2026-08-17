@@ -2,7 +2,8 @@ package com.cram.generator.controller;
 
 import com.cram.generator.model.ValidationResult;
 import com.cram.generator.service.CramValidator;
-import lombok.RequiredArgsConstructor;
+import com.cram.generator.service.FeatureExtractor;
+import com.cram.generator.service.MutationGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,15 +12,26 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * REST API controller for CRAM validation.
+ * REST API: validate, 163D features, mutation generate.
+ * Property-conditioned CVAE remains in the Python edition.
  */
 @RestController
 @RequestMapping("/api/v1")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class CramController {
 
     private final CramValidator cramValidator;
+    private final FeatureExtractor featureExtractor;
+    private final MutationGenerator mutationGenerator;
+
+    public CramController(
+            CramValidator cramValidator,
+            FeatureExtractor featureExtractor,
+            MutationGenerator mutationGenerator) {
+        this.cramValidator = cramValidator;
+        this.featureExtractor = featureExtractor;
+        this.mutationGenerator = mutationGenerator;
+    }
 
     /**
      * Health check endpoint.
@@ -75,9 +87,36 @@ public class CramController {
         ));
     }
 
-    /**
-     * Get CRAM criteria information.
-     */
+    @GetMapping("/features")
+    public ResponseEntity<FeatureResponse> features(@RequestParam String smiles) {
+        double[][] atom = featureExtractor.extractFeatures(smiles);
+        double[] mol = featureExtractor.extractMoleculeFeatures(smiles);
+        return ResponseEntity.ok(new FeatureResponse(
+                smiles,
+                atom.length,
+                FeatureExtractor.FEATURE_DIM,
+                featureExtractor.countNonZero(atom),
+                mol
+        ));
+    }
+
+    @PostMapping("/generate")
+    public ResponseEntity<GenerateResponse> generate(
+            @RequestBody(required = false) GenerateRequest request) {
+        if (request == null) {
+            request = new GenerateRequest(20, 5000);
+        }
+        int n = request.n() == null ? 20 : request.n();
+        int maxAttempts = request.maxAttempts() == null ? 5000 : request.maxAttempts();
+        List<String> smiles = mutationGenerator.generate(n, maxAttempts);
+        return ResponseEntity.ok(new GenerateResponse(
+                smiles.size(),
+                "mutation",
+                "CVAE sampling is Python-only",
+                smiles
+        ));
+    }
+
     @GetMapping("/criteria")
     public ResponseEntity<Map<String, Object>> getCriteria() {
         return ResponseEntity.ok(Map.of(
@@ -101,5 +140,22 @@ public class CramController {
         int valid,
         int invalid,
         List<ValidationResult> results
+    ) {}
+
+    public record FeatureResponse(
+        String smiles,
+        int nAtoms,
+        int featureDim,
+        int nonZero,
+        double[] moleculeFeatures
+    ) {}
+
+    public record GenerateRequest(Integer n, Integer maxAttempts) {}
+
+    public record GenerateResponse(
+        int count,
+        String method,
+        String note,
+        List<String> smiles
     ) {}
 }

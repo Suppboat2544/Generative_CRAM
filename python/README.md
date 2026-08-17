@@ -14,7 +14,7 @@ The trained production CVAE uses a **64-dimensional latent space**.
 4. Generate molecules with CVAE (checkpoint required) or SELFIES mutation.
 5. Search PubChem for CRAM-like seeds.
 
-Sibling editions: [Java REST/CLI](../java/README.md) · [Julia CLI](../julia/README.md) · [repo root](../README.md)
+Sibling editions: [Java REST/CLI](../java/README.md) (validate, 163D features, mutation generate) · [Julia CLI](../julia/README.md) · [repo root](../README.md). Property-conditioned CVAE training and `.pt` sampling stay here.
 
 **Assets:** [Google Drive](https://drive.google.com/drive/folders/1mA7STHTioD52j54_GYeP_1OnNFslBNc4?usp=sharing) (`cram_data`, `models`, `Generated_Structures`) — copy into `data/`, `models/`, and `outputs/Generated_Structures/` as described in [DATA.md](../DATA.md).
 
