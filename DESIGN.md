@@ -76,28 +76,32 @@ Use Java/Julia mutation for services and smoke tests. Use **`python/` + Drive `m
 Trained latent size is **64** (not 128).
 
 ```text
-SMILES
-  → RDKit mol → DGL graph
-  → 163D features / atom
-  → GAT encoder (3 layers, 4 heads, hidden 256)
-  → μ, log σ²  →  z ∈ R^64     (reparameterize)
-  → PropertyConditionEncoder → c ∈ R^32
-  → GRU SELFIES decoder (2 layers, hidden 256)
-  → tokens → SELFIES → SMILES
+SMILES → RDKit mol → DGL graph
+       → 163D / atom → Linear 163→256
+       → GAT × 3, 4 heads × 64, residual + LayerNorm
+       → gated mean pool → 256 → μ, log σ² → z ∈ R⁶⁴
+       → property MLP → c ∈ R³²
+       → concat 96 → GRU 256 × 2 → SELFIES → SMILES
 ```
 
 | Piece | Size |
 |-------|------|
 | Atom features | 163 |
-| Encoder hidden | 256 |
-| GAT layers / heads | 3 / 4 |
+| GAT width | 256 |
+| GAT layers / heads / per-head | 3 / 4 / 64 |
+| Pooling | gated mean (`σ(Linear(256→1))` then `mean_nodes`) |
 | **Latent z** | **64** |
-| Condition c | 32 |
-| Decoder | GRU, 2 layers, hidden 256 |
-| Max SELFIES length | 100 (CVAE) / 150 (tokenizer) |
-| Tokens (tokenizer-aligned) | PAD=0, SOS=1, EOS=2, UNK=3 |
+| Property concat | 35 (emb 8+16+4 + continuous 7) |
+| Condition MLP hidden | 64 |
+| **Condition c** | **32** |
+| GRU | 256 hidden, 2 layers |
+| Token embed / output | 256 ↔ vocab |
+| Max length | 100 (CVAE) / 150 (tokenizer) |
+| Special tokens | PAD=0, SOS=1, EOS=2, UNK=3 |
 
-Condition inputs include `n_cooh`, 6 ring classes (fused / mixed / benzene+aliphatic / pure alicyclic / pure aromatic / acyclic), aliphatic %, normalized MW, benzene flag, DBE/C, DBE/O, DBE/H, mean ring size, ring-size class.
+Vocabulary size is **4 + unique SELFIES tokens** from the training CSV (saved with the checkpoint).
+
+Property embeddings: `n_cooh` 7×8, ring class 6×16, ring-size class 3×4, plus 7 continuous values (aliphatic %, MW, benzene, DBE/C, DBE/O, DBE/H, mean ring size).
 
 Training: `python/scripts/train_cvae.py --latent-dim 64`. Sampling: `python main.py generate --mode vae --checkpoint models/<file>.pt`. Weights are **not** in git — [DATA.md](DATA.md).
 

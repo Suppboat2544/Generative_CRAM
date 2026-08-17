@@ -110,12 +110,13 @@ SELFIES tokens → SMILES
 | Parameter | Value |
 |-----------|-------|
 | Atom feature dimension | 163 |
-| Encoder hidden size | 256 |
+| Encoder hidden / GAT | 256 wide, 3 layers, 4 heads × 64 |
+| Pooling | gated mean |
 | **Latent dimension** | **64** |
-| Condition dimension | 32 |
-| GAT heads / layers | 4 / 3 |
-| GRU decoder layers | 2 |
-| Token IDs | PAD=0, SOS=1, EOS=2, UNK=3 |
+| Property concat / MLP / **c** | 35 / 64 / **32** |
+| GRU decoder | 256 hidden, 2 layers; embed 256 → vocab |
+| Max length | 100 |
+| Special tokens | PAD=0, SOS=1, EOS=2, UNK=3 |
 
 ### 163D atom feature groups
 
