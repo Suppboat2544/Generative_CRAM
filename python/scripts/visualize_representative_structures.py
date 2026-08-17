@@ -83,10 +83,10 @@ def draw_molecule_with_properties(ax, smiles, title, properties):
     
     # Compliance status
     if properties['compliant']:
-        status_text = "✓ CRAM Compliant"
+        status_text = " CRAM Compliant"
         status_color = '#27ae60'
     else:
-        status_text = "⚠ Partial Compliance"
+        status_text = " Partial Compliance"
         status_color = '#e67e22'
     
     props_text.append(f"{status_text}")
@@ -117,17 +117,17 @@ def create_property_radar(ax, properties_list, names):
     data = []
     for props in properties_list:
         normalized = [
-            props['cooh'] / 5.0,  # Max 5 COOH
-            props['aliphatic'] / 100.0,  # Max 100%
-            props['oc_ratio'] / 0.6,  # Target max 0.6
-            props['rings'] / 4.0,  # Max 4 rings
-            props['mw'] / 400.0  # Max 400 Da
+            props['cooh'] / 5.0, # Max 5 COOH
+            props['aliphatic'] / 100.0, # Max 100%
+            props['oc_ratio'] / 0.6, # Target max 0.6
+            props['rings'] / 4.0, # Max 4 rings
+            props['mw'] / 400.0 # Max 400 Da
         ]
         data.append(normalized)
     
     # Compute angle for each axis
     angles = [n / float(N) * 2 * np.pi for n in range(N)]
-    data = [d + [d[0]] for d in data]  # Close the plot
+    data = [d + [d[0]] for d in data] # Close the plot
     angles += angles[:1]
     
     # Plot
@@ -199,7 +199,7 @@ fig.suptitle('Representative Generated CRAM Structures',
 
 # Plot each molecule
 for i, (mol_data, props) in enumerate(zip(molecules, properties_list)):
-    ax = fig.add_subplot(gs[i, :2])
+    ax = fig.add_subplot(gs[i,:2])
     draw_molecule_with_properties(ax, mol_data['smiles'], 
                                   mol_data['name'], props)
 
@@ -264,9 +264,9 @@ fig.text(0.78, 0.12, criteria_text, fontsize=9,
 # Add statistics summary
 summary_text = (
     f"Compliance Summary:\n"
-    f"Example 1: {'✓ Full' if properties_list[0]['compliant'] else '✗ Partial'}\n"
-    f"Example 2: {'✓ Full' if properties_list[1]['compliant'] else '✗ Partial'}\n"
-    f"Example 3: {'✓ Full' if properties_list[2]['compliant'] else '✗ Partial'}"
+    f"Example 1: {' Full' if properties_list[0]['compliant'] else ' Partial'}\n"
+    f"Example 2: {' Full' if properties_list[1]['compliant'] else ' Partial'}\n"
+    f"Example 3: {' Full' if properties_list[2]['compliant'] else ' Partial'}"
 )
 
 fig.text(0.78, 0.30, summary_text, fontsize=9,
@@ -278,13 +278,13 @@ fig.text(0.78, 0.30, summary_text, fontsize=9,
 output_path = 'figures/representative_structures.png'
 plt.savefig(output_path, dpi=300, bbox_inches='tight', 
             facecolor='white', edgecolor='none')
-print(f"✓ Saved: {output_path}")
+print(f" Saved: {output_path}")
 
 # Also save high-res version
 output_path_hires = 'figures/representative_structures_highres.png'
 plt.savefig(output_path_hires, dpi=700, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print(f"✓ Saved high-resolution: {output_path_hires}")
+print(f" Saved high-resolution: {output_path_hires}")
 
 plt.close()
 

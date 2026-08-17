@@ -125,17 +125,21 @@ SELFIES tokens → SMILES
 
 ### 163D atom feature groups
 
+Notebook order (same as `DeepCRAMFeatureExtractor.FEATURE_DIMS`):
+
 | Group | Dims | Description |
 |-------|:----:|-------------|
-| Base atom features | 45 | Atom type, bonds, hybridization |
-| Ring–chain | 20 | Ring membership, chain context |
-| Stereochemistry | 12 | Chirality / stereo flags |
-| Marine DOM | 15 | Ocean-chemistry indicators |
+| Base atom features | 45 | Element, hybridization, bonds, charge, ring |
 | Synthetic accessibility | 28 | Complexity / SA-related flags |
-| Terpenoid | 10 | Natural-product ancestry |
+| Marine DOM | 15 | Ocean-chemistry indicators |
+| Ring–chain | 20 | Alicyclic rings, junctions, carboxyl proximity |
+| Stereochemistry | 12 | Chirality, ring conformation, strain |
+| Terpenoid | 10 | Isoprene / natural-product ancestry |
 | Functional groups | 13 | COOH, OH, carbonyl, etc. |
-| Oxidation | 20 | Redox / heteroatom environment |
+| Enhanced oxidation | 20 | Oxidation state, COOH α/β/γ/δ proximity |
 | **Total** | **163** | |
+
+Production sampling still uses the GRU CVAE (`PropertyConditionedCRAMVAE`, `decoder.gru`). Notebook Transformer VAEs (`DeepCRAMVAE`, `PropertyConditionedTransformerVAE`, `MultimodalTransformerVAE`, `TransformerVAE`) live in `src/models/transformer_vae.py` and use the GAT + ring-chain + FG encoder (`src/models/deep_cram_encoder.py`). Do not load `best_cram_model.pt` into the GRU CVAE.
 
 ---
 
@@ -161,9 +165,9 @@ python/
 ├── main.py                 CLI: validate / generate / features / ui / info
 ├── cli.py
 ├── config/settings.py      latent_dim=64
-├── src/models/             encoder, decoder, CVAE, losses
-├── src/generators/         mutation + CVAE sampling
-├── src/features/           163D atom features
+├── src/models/             GRU CVAE + notebook Transformer / GAT encoders
+├── src/generators/         mutation + CVAE sampling + notebook HT generators
+├── src/features/           163D atom features (notebook layout)
 ├── ui/                     Gradio
 ├── scripts/                train_cvae.py, PubChem, figures
 ├── data/                   from Drive `cram_data` (not committed)

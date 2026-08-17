@@ -16,8 +16,8 @@ def print_banner():
     """Print application banner."""
     print("""
 ╔═══════════════════════════════════════════════════════════╗
-║           🧬 CRAM Generator - Python Edition              ║
-║     Deep Learning Toolkit for Marine DOM Molecules        ║
+║ CRAM Generator - Python Edition ║
+║ Deep Learning Toolkit for Marine DOM Molecules ║
 ╚═══════════════════════════════════════════════════════════╝
     """)
 
@@ -26,52 +26,52 @@ def print_validation_result(result: dict, verbose: bool = False):
     """Print formatted validation result."""
     print()
     print("═" * 60)
-    print("🧬 CRAM Validation Report")
+    print("CRAM Validation Report")
     print("═" * 60)
     print()
-    print(f"📋 SMILES: {result.get('smiles', 'N/A')}")
+    print(f"SMILES: {result.get('smiles', 'N/A')}")
     
     if result.get('canonical'):
-        print(f"📋 Canonical: {result['canonical']}")
+        print(f"Canonical: {result['canonical']}")
     
     print()
     print("─" * 60)
-    print("📊 CRAM Criteria:")
+    print("CRAM Criteria:")
     print("─" * 60)
     
     # Carboxyl groups
     cooh = result.get('n_cooh', 0)
     cooh_ok = cooh >= 2
-    print(f"  {'✅' if cooh_ok else '❌'} Carboxyl groups: {cooh} (≥2 required)")
+    print(f"[{'OK' if cooh_ok else 'NO'}] Carboxyl groups: {cooh} (>=2 required)")
     
     # Alicyclic ring
     alicyclic = result.get('has_alicyclic', False)
-    print(f"  {'✅' if alicyclic else '❌'} Alicyclic ring: {'Present' if alicyclic else 'Absent'}")
+    print(f"[{'OK' if alicyclic else 'NO'}] Alicyclic ring: {'Present' if alicyclic else 'Absent'}")
     
     # Aliphatic carbon
     aliphatic = result.get('aliphatic_pct', 0) * 100
     aliphatic_ok = aliphatic >= 60
-    print(f"  {'✅' if aliphatic_ok else '❌'} Aliphatic carbon: {aliphatic:.1f}% (≥60% required)")
+    print(f"[{'OK' if aliphatic_ok else 'NO'}] Aliphatic carbon: {aliphatic:.1f}% (>=60% required)")
     
     # Molecular weight
     mw = result.get('mw', 0)
     mw_ok = 100 <= mw <= 750
-    print(f"  {'✅' if mw_ok else '❌'} Molecular weight: {mw:.1f} Da (100-750 range)")
+    print(f"[{'OK' if mw_ok else 'NO'}] Molecular weight: {mw:.1f} Da (100-750 range)")
     
     print()
     print("─" * 60)
     is_valid = result.get('is_cram', False)
-    print(f"🎯 Result: {'✅ VALID CRAM MOLECULE' if is_valid else '❌ NOT A CRAM MOLECULE'}")
+    print(f"Result: {'VALID CRAM MOLECULE' if is_valid else 'NOT A CRAM MOLECULE'}")
     print("═" * 60)
     
     if verbose and result.get('properties'):
         print()
-        print("📊 Additional Properties:")
+        print("Additional Properties:")
         for key, value in result['properties'].items():
             if isinstance(value, float):
-                print(f"   {key}: {value:.4f}")
+                print(f"  {key}: {value:.4f}")
             else:
-                print(f"   {key}: {value}")
+                print(f"  {key}: {value}")
 
 
 def validate_command(args):
@@ -97,7 +97,7 @@ def batch_command(args):
     # Read input file
     input_path = Path(args.input_file)
     if not input_path.exists():
-        print(f"❌ Error: File not found: {input_path}")
+        print(f"Error: File not found: {input_path}")
         return 1
     
     smiles_list = []
@@ -108,10 +108,10 @@ def batch_command(args):
                 smiles_list.append(smiles)
     
     if not smiles_list:
-        print("❌ Error: No SMILES found in file")
+        print("Error: No SMILES found in file")
         return 1
     
-    print(f"\n📂 Processing {len(smiles_list)} molecules from {input_path}")
+    print(f"\n Processing {len(smiles_list)} molecules from {input_path}")
     
     # Validate all
     results = []
@@ -139,14 +139,14 @@ def batch_command(args):
             writer = csv.DictWriter(f, fieldnames=results[0].keys())
             writer.writeheader()
             writer.writerows(results)
-        print(f"📁 Results saved to: {output_path}")
+        print(f"Results saved to: {output_path}")
     
     # Print summary
     print()
-    print("📊 Batch Validation Complete")
-    print(f"   Total: {len(smiles_list)}")
-    print(f"   Valid CRAM: {valid_count} ({100*valid_count/len(smiles_list):.1f}%)")
-    print(f"   Invalid: {len(smiles_list) - valid_count}")
+    print("Batch Validation Complete")
+    print(f"Total: {len(smiles_list)}")
+    print(f"Valid CRAM: {valid_count} ({100*valid_count/len(smiles_list):.1f}%)")
+    print(f"Invalid: {len(smiles_list) - valid_count}")
     
     return 0
 
@@ -160,7 +160,7 @@ def generate_command(args):
     
     print()
     print("═" * 60)
-    print("🧬 CRAM Generation")
+    print("CRAM Generation")
     print("═" * 60)
     print(f"Target: {args.count:,} molecules")
     print(f"Mode: {args.mode}")
@@ -177,8 +177,8 @@ def generate_command(args):
     if args.mode == 'cvae':
         # CVAE generation requires trained model
         if not args.checkpoint:
-            print("❌ CVAE mode requires --checkpoint path to trained model")
-            print("   Use --mode mutation for model-free generation")
+            print("CVAE mode requires --checkpoint path to trained model")
+            print("Use --mode mutation for model-free generation")
             return 1
         
         try:
@@ -187,7 +187,7 @@ def generate_command(args):
             from src.tokenizer import SELFIESTokenizer
             from src.generators import FastPropertyConditionedGenerator
             
-            print("\n🔧 Loading CVAE model...")
+            print("\n Loading CVAE model...")
             
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
             
@@ -232,9 +232,9 @@ def generate_command(args):
             )
             
             # Generate with conditions
-            print(f"   Target COOH: {args.target_cooh}")
-            print(f"   Target MW: {args.target_mw}")
-            print(f"   Target Aliphatic: {args.target_aliphatic}")
+            print(f"Target COOH: {args.target_cooh}")
+            print(f"Target MW: {args.target_mw}")
+            print(f"Target Aliphatic: {args.target_aliphatic}")
             
             molecules = generator.generate_batch(
                 properties={
@@ -251,8 +251,8 @@ def generate_command(args):
             df = pd.DataFrame({'smiles': molecules})
             
         except Exception as e:
-            print(f"❌ Error loading CVAE model: {e}")
-            print("   Falling back to mutation mode...")
+            print(f"Error loading CVAE model: {e}")
+            print("Falling back to mutation mode...")
             args.mode = 'mutation'
     
     if args.mode == 'mutation':
@@ -303,8 +303,8 @@ def generate_command(args):
     
     print()
     print("═" * 60)
-    print(f"✅ Generated {len(df):,} CRAM molecules")
-    print(f"📁 Saved to: {args.output}")
+    print(f"Generated {len(df):,} CRAM molecules")
+    print(f"Saved to: {args.output}")
     print("═" * 60)
     
     return 0
@@ -320,36 +320,36 @@ def features_command(args):
     
     print()
     print("═" * 60)
-    print("🔬 163D Feature Extraction")
+    print("163D Feature Extraction")
     print("═" * 60)
     
     for smiles in args.smiles:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
-            print(f"\n❌ Invalid SMILES: {smiles}")
+            print(f"\n Invalid SMILES: {smiles}")
             continue
         
         features = extractor.extract_features(mol)
         
-        print(f"\n📋 SMILES: {smiles}")
-        print(f"   Atoms: {mol.GetNumAtoms()}")
-        print(f"   Feature shape: {features.shape}")
-        print(f"   Non-zero: {np.count_nonzero(features):,}")
+        print(f"\n SMILES: {smiles}")
+        print(f"Atoms: {mol.GetNumAtoms()}")
+        print(f"Feature shape: {features.shape}")
+        print(f"Non-zero: {np.count_nonzero(features):,}")
         
         if args.verbose:
-            print("\n   Feature breakdown:")
-            print(f"   ├── Base features (0-44): {np.sum(np.abs(features[:, :45])):.2f}")
-            print(f"   ├── Ring-Chain (45-64): {np.sum(np.abs(features[:, 45:65])):.2f}")
-            print(f"   ├── Stereo (65-76): {np.sum(np.abs(features[:, 65:77])):.2f}")
-            print(f"   ├── Marine DOM (77-119): {np.sum(np.abs(features[:, 77:120])):.2f}")
-            print(f"   ├── Terpenoid (120-129): {np.sum(np.abs(features[:, 120:130])):.2f}")
-            print(f"   ├── Functional (130-142): {np.sum(np.abs(features[:, 130:143])):.2f}")
-            print(f"   └── Oxidation (143-162): {np.sum(np.abs(features[:, 143:163])):.2f}")
+            print("\n Feature breakdown:")
+            print(f" ├── Base features (0-44): {np.sum(np.abs(features[:,:45])):.2f}")
+            print(f" ├── Ring-Chain (45-64): {np.sum(np.abs(features[:, 45:65])):.2f}")
+            print(f" ├── Stereo (65-76): {np.sum(np.abs(features[:, 65:77])):.2f}")
+            print(f" ├── Marine DOM (77-119): {np.sum(np.abs(features[:, 77:120])):.2f}")
+            print(f" ├── Terpenoid (120-129): {np.sum(np.abs(features[:, 120:130])):.2f}")
+            print(f" ├── Functional (130-142): {np.sum(np.abs(features[:, 130:143])):.2f}")
+            print(f" └── Oxidation (143-162): {np.sum(np.abs(features[:, 143:163])):.2f}")
         
         if args.save:
             output = Path(args.save)
             np.save(output, features)
-            print(f"   💾 Saved to: {output}")
+            print(f"Saved to: {output}")
     
     print()
     return 0
@@ -359,19 +359,19 @@ def info_command(args):
     """Show CRAM criteria and system information."""
     print("""
 ╔═══════════════════════════════════════════════════════════╗
-║              🧬 CRAM Molecule Criteria                    ║
+║ CRAM Molecule Criteria ║
 ╚═══════════════════════════════════════════════════════════╝
 
 CRAM (Carboxyl-Rich Alicyclic Molecules) are key components
 of marine dissolved organic matter (DOM).
 
 ┌───────────────────────────────────────────────────────────┐
-│ Criterion            │ Requirement                       │
+│ Criterion │ Requirement │
 ├───────────────────────────────────────────────────────────┤
-│ Carboxyl groups      │ ≥2 (COOH or COO⁻)                 │
-│ Ring structure       │ Alicyclic (non-aromatic)          │
-│ Aliphatic carbon     │ >60%                              │
-│ Molecular weight     │ 100-750 Da                        │
+│ Carboxyl groups │ ≥2 (COOH or COO⁻) │
+│ Ring structure │ Alicyclic (non-aromatic) │
+│ Aliphatic carbon │ >60% │
+│ Molecular weight │ 100-750 Da │
 └───────────────────────────────────────────────────────────┘
 
 Example valid CRAM: CC1CCC(CC1)(C(=O)O)C(=O)O
@@ -380,23 +380,23 @@ Example valid CRAM: CC1CCC(CC1)(C(=O)O)C(=O)O
     
     # System info
     import platform
-    print("📊 System Information:")
-    print(f"   Python: {platform.python_version()}")
-    print(f"   Platform: {platform.system()} {platform.machine()}")
+    print("System Information:")
+    print(f"Python: {platform.python_version()}")
+    print(f"Platform: {platform.system()} {platform.machine()}")
     
     try:
         import torch
-        print(f"   PyTorch: {torch.__version__}")
+        print(f"PyTorch: {torch.__version__}")
         if torch.cuda.is_available():
-            print(f"   CUDA: {torch.version.cuda} ({torch.cuda.get_device_name(0)})")
+            print(f"CUDA: {torch.version.cuda} ({torch.cuda.get_device_name(0)})")
         elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-            print("   MPS: Available (Apple Silicon)")
+            print("MPS: Available (Apple Silicon)")
     except ImportError:
         pass
     
     try:
         from rdkit import __version__ as rdkit_version
-        print(f"   RDKit: {rdkit_version}")
+        print(f"RDKit: {rdkit_version}")
     except ImportError:
         pass
     
@@ -409,9 +409,9 @@ def ui_command(args):
     from ui.app import launch_app
     
     print_banner()
-    print(f"🌐 Starting server on port {args.port}...")
+    print(f"Starting server on port {args.port}...")
     if args.share:
-        print("📤 Creating public link...")
+        print("Creating public link...")
     print()
     
     launch_app(
@@ -426,7 +426,7 @@ def create_parser() -> argparse.ArgumentParser:
     """Create argument parser."""
     parser = argparse.ArgumentParser(
         prog="cram",
-        description="🧬 CRAM Generator - Deep Learning Toolkit for Marine DOM Molecules",
+        description=" CRAM Generator - Deep Learning Toolkit for Marine DOM Molecules",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

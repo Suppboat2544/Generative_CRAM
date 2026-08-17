@@ -165,10 +165,10 @@ for result in results:
         compliant = all([cooh_ok, aliphatic_ok, oc_ok, rings_ok])
         
         print(f"\n{result['Example']}")
-        print(f"  ✓ COOH ≥ 2: {result['COOH']} {'✓' if cooh_ok else '✗'}")
-        print(f"  ✓ Aliphatic ≥ 70%: {result['Aliphatic %']} {'✓' if aliphatic_ok else '✗'}")
-        print(f"  ✓ O/C 0.4-0.6: {result['O/C Ratio']} {'✓' if oc_ok else '✗'}")
-        print(f"  ✓ Alicyclic Rings ≥ 1: {result['Alicyclic Rings']} {'✓' if rings_ok else '✗'}")
-        print(f"  → CRAM Compliant: {'YES ✓' if compliant else 'NO ✗'}")
+        print(f" COOH ≥ 2: {result['COOH']} {'' if cooh_ok else ''}")
+        print(f" Aliphatic ≥ 70%: {result['Aliphatic %']} {'' if aliphatic_ok else ''}")
+        print(f" O/C 0.4-0.6: {result['O/C Ratio']} {'' if oc_ok else ''}")
+        print(f" Alicyclic Rings ≥ 1: {result['Alicyclic Rings']} {'' if rings_ok else ''}")
+        print(f" → CRAM Compliant: {'YES ' if compliant else 'NO '}")
 
 print("\n" + "=" * 100)

@@ -62,7 +62,7 @@ class FastPropertyConditionedGenerator:
     }
 
     # Allowed atoms for CRAM molecules
-    ALLOWED_ATOMS = {6, 1, 8, 7, 16, 9, 17, 35, 53}  # C, H, O, N, S, F, Cl, Br, I
+    ALLOWED_ATOMS = {6, 1, 8, 7, 16, 9, 17, 35, 53} # C, H, O, N, S, F, Cl, Br, I
 
     def __init__(
         self,
@@ -395,8 +395,8 @@ class FastPropertyConditionedGenerator:
 
         if save_path:
             df.to_csv(save_path, index=False)
-            print(f"✓ Saved {len(df):,} molecules to {save_path}")
+            print(f" Saved {len(df):,} molecules to {save_path}")
 
-        print(f"✓ Generated {len(df):,} valid CRAM molecules")
+        print(f" Generated {len(df):,} valid CRAM molecules")
         return df
 

@@ -36,7 +36,7 @@ def validate_batch(smiles_text: str) -> Tuple[str, str]:
     results = []
     valid_count = 0
     
-    for i, smiles in enumerate(smiles_list[:100]):  # Limit to 100
+    for i, smiles in enumerate(smiles_list[:100]): # Limit to 100
         result = validator.validate(smiles)
         is_valid = result.get('valid', False)
         if is_valid:
@@ -45,7 +45,7 @@ def validate_batch(smiles_text: str) -> Tuple[str, str]:
         results.append({
             'Index': i + 1,
             'SMILES': smiles[:50] + '...' if len(smiles) > 50 else smiles,
-            'Valid': '✓' if is_valid else '✗',
+            'Valid': '' if is_valid else '',
             'Score': f"{result.get('cram_score', 0):.3f}",
             'MW': f"{result.get('mw', 0):.1f}",
             'Message': result.get('reason', '')[:30]

@@ -15,6 +15,7 @@ import dgl
 from rdkit import Chem
 
 from src.features import DeepCRAMFeatureExtractor
+from src.features.extractor import smiles_to_graph_deep_cram
 from src.utils import SMILESAugmenter, canonicalize_smiles
 
 
@@ -22,49 +23,8 @@ def smiles_to_graph(
     smiles: str, 
     feature_extractor: Optional[DeepCRAMFeatureExtractor] = None
 ) -> Optional[dgl.DGLGraph]:
-    """
-    Convert SMILES to DGL graph with 163D features.
-    
-    Args:
-        smiles: SMILES string
-        feature_extractor: Feature extractor instance
-        
-    Returns:
-        DGL graph with node features, or None if invalid
-    """
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None
-    
-    if feature_extractor is None:
-        feature_extractor = DeepCRAMFeatureExtractor()
-    
-    features = feature_extractor.extract(smiles)
-    if features is None:
-        return None
-    
-    # Build edges from bonds
-    src, dst = [], []
-    for bond in mol.GetBonds():
-        i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        src.extend([i, j])
-        dst.extend([j, i])
-    
-    # Create graph
-    if src:
-        g = dgl.graph((src, dst), num_nodes=mol.GetNumAtoms())
-    else:
-        g = dgl.graph(([], []), num_nodes=mol.GetNumAtoms())
-    
-    # Add self-loops (critical for GNN stability)
-    g = dgl.add_self_loop(g)
-    
-    # Add features
-    g.ndata['feat'] = torch.tensor(features['atom_features'], dtype=torch.float32)
-    g.ndata['group'] = torch.tensor(features['group_membership'], dtype=torch.float32)
-    g.mol_features = torch.tensor(features['mol_features'], dtype=torch.float32)
-    
-    return g
+    """Convert SMILES to DGL graph with notebook 163D features and CRAM masks."""
+    return smiles_to_graph_deep_cram(smiles, feature_extractor)
 
 
 class CRAMDataset(Dataset):

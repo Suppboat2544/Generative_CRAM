@@ -13,13 +13,13 @@ data = {
         'Total Generated',
         'Valid SMILES',
         'Parseable Molecules',
-        '',  # Separator row
+        '', # Separator row
         'CRAM Compliance:',
         '≥2 Carboxyl Groups',
         '≥70% Aliphatic Carbon',
         'O/C Ratio (0.4-0.6)',
         '≥1 Alicyclic Ring',
-        '',  # Separator row
+        '', # Separator row
         'Full CRAM Criteria'
     ],
     'Count': [
@@ -144,7 +144,7 @@ ws.column_dimensions['C'].width = 15
 # Save workbook
 wb.save(output_file)
 
-print(f"✓ Successfully saved Batch Generation Statistics to '{output_file}'")
-print(f"  Location: /Users/suppboat/Generative_CRAM_Fragment/{output_file}")
-print(f"  Rows: {len(df)}")
-print(f"  Columns: {len(df.columns)}")
+print(f" Successfully saved Batch Generation Statistics to '{output_file}'")
+print(f" Location: /Users/suppboat/Generative_CRAM_Fragment/{output_file}")
+print(f" Rows: {len(df)}")
+print(f" Columns: {len(df.columns)}")

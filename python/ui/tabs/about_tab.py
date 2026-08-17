@@ -23,22 +23,22 @@ def create_about_tab():
         
         ## Features
         
-        ### 🔬 Property-Conditioned CVAE
+        ### Property-Conditioned CVAE
         - Conditional Variational Autoencoder for targeted molecule generation
         - Control molecular properties: carboxyl groups, molecular weight, aliphatic content
         - Fast batch generation with 100K+ molecules capability
         
-        ### 🧬 SELFIES Mutation Generator
+        ### SELFIES Mutation Generator
         - Chemically valid mutations using SELFIES representation
         - Maintains structural validity during generation
         - Configurable mutation rates
         
-        ### ✅ CRAM Validation
+        ### CRAM Validation
         - Multi-criteria validation for CRAM characteristics
         - Marine DOM property assessment
         - Synthetic accessibility scoring
         
-        ### 📊 163D Feature Extraction
+        ### 163D Feature Extraction
         - **Base Features (45D):** Atom types, bonds, molecular descriptors
         - **Ring-Chain Features (20D):** Ring systems and chain analysis
         - **Stereochemistry (12D):** Chiral centers and isomerism
@@ -55,9 +55,9 @@ def create_about_tab():
         PropertyConditionedCRAMVAE
         ├── PropertyConditionEncoder (3 → 32D)
         ├── DeepCRAMEncoder (163D → 256D → 64D latent)
-        │   ├── GraphConv layers
-        │   ├── GAT attention
-        │   └── Global pooling
+        │ ├── GraphConv layers
+        │ ├── GAT attention
+        │ └── Global pooling
         └── SELFIESDecoder (64D + 32D → SELFIES tokens)
             ├── GRU layers
             └── Token projection

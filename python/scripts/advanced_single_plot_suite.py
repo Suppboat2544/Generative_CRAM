@@ -162,7 +162,7 @@ def plot_cram_property_space_density(cram_data, save_path='fig1_cram_property_sp
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -199,7 +199,7 @@ def plot_cram_radial_features(cram_data, save_path='fig2_cram_radial_features.pn
     # Number of features
     num_vars = len(normalized_features)
     angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
-    angles += angles[:1]  # Complete the circle
+    angles += angles[:1] # Complete the circle
     
     # Color palette
     colors = plt.cm.tab10(np.linspace(0, 1, len(top_molecules)))
@@ -207,7 +207,7 @@ def plot_cram_radial_features(cram_data, save_path='fig2_cram_radial_features.pn
     # Plot each molecule
     for idx, (i, row) in enumerate(top_molecules.iterrows()):
         values = [row[feat] for feat in normalized_features]
-        values += values[:1]  # Complete the circle
+        values += values[:1] # Complete the circle
         
         ax.plot(angles, values, 'o-', linewidth=4, 
                color=colors[idx], alpha=0.8, markersize=12,
@@ -235,7 +235,7 @@ def plot_cram_radial_features(cram_data, save_path='fig2_cram_radial_features.pn
              fontsize=20, frameon=True, shadow=True, fancybox=True)
     
     # Add reference circle for ideal molecule
-    ideal_values = [0.9, 0.5, 0.75, 0.5, 0.5]  # Ideal normalized values
+    ideal_values = [0.9, 0.5, 0.75, 0.5, 0.5] # Ideal normalized values
     ideal_values += ideal_values[:1]
     ax.plot(angles, ideal_values, 'k--', linewidth=5, alpha=0.5, 
            label='Ideal Profile', zorder=10)
@@ -243,7 +243,7 @@ def plot_cram_radial_features(cram_data, save_path='fig2_cram_radial_features.pn
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -268,7 +268,7 @@ def plot_binding_affinity_heatmap(docking_results, enzyme_data,
     ).fillna(0)
     
     # Limit to top 30 enzymes and 40 molecules for visibility
-    pivot = pivot.iloc[:30, :40]
+    pivot = pivot.iloc[:30,:40]
     
     # Create figure
     fig, ax = plt.subplots(figsize=(28, 24), dpi=dpi)
@@ -354,7 +354,7 @@ def plot_binding_affinity_heatmap(docking_results, enzyme_data,
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -461,9 +461,9 @@ def plot_md_trajectory_landscape(md_results,
     stats_text = "Simulation Statistics:\n\n"
     for i, result in enumerate(top_3):
         stats_text += f"Complex {i+1}:\n"
-        stats_text += f"  Mean RMSD: {np.mean(result['rmsd']):.2f} Å\n"
-        stats_text += f"  Mean H-Bonds: {np.mean(result['h_bonds']):.1f}\n"
-        stats_text += f"  Temp: {np.mean(result['temperature']):.1f} K\n\n"
+        stats_text += f" Mean RMSD: {np.mean(result['rmsd']):.2f} Å\n"
+        stats_text += f" Mean H-Bonds: {np.mean(result['h_bonds']):.1f}\n"
+        stats_text += f" Temp: {np.mean(result['temperature']):.1f} K\n\n"
     
     ax1.text(0.98, 0.02, stats_text, transform=ax1.transAxes,
             fontsize=20, verticalalignment='bottom', horizontalalignment='right',
@@ -474,7 +474,7 @@ def plot_md_trajectory_landscape(md_results,
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -528,7 +528,7 @@ def plot_interaction_network(docking_results, enzyme_data,
             x2, y2 = molecule_pos[mol]
             
             # Line width based on affinity (stronger = thicker)
-            linewidth = (-affinity - 8) * 2  # Scale to visible range
+            linewidth = (-affinity - 8) * 2 # Scale to visible range
             
             # Color based on cluster
             color = ENZYME_COLORS[f'cluster_{cluster+1}']
@@ -638,7 +638,7 @@ def plot_interaction_network(docking_results, enzyme_data,
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -760,9 +760,9 @@ def plot_pipeline_sankey(cram_data, enzyme_data, docking_results, md_results,
     metrics_text += f"Final: {counts[-1]:,} stable complexes\n"
     metrics_text += f"Success Rate: {final_efficiency:.2f}%\n\n"
     metrics_text += "Quality Gates:\n"
-    metrics_text += f"✓ CRAM validation: {(counts[1]/counts[0])*100:.1f}%\n"
-    metrics_text += f"✓ Strong binding: {(counts[4]/counts[3])*100:.1f}%\n"
-    metrics_text += f"✓ MD stability: {(counts[5]/counts[4])*100:.1f}%"
+    metrics_text += f" CRAM validation: {(counts[1]/counts[0])*100:.1f}%\n"
+    metrics_text += f" Strong binding: {(counts[4]/counts[3])*100:.1f}%\n"
+    metrics_text += f" MD stability: {(counts[5]/counts[4])*100:.1f}%"
     
     ax.text(0.02, 0.98, metrics_text, transform=ax.transAxes,
            fontsize=22, verticalalignment='top',
@@ -773,7 +773,7 @@ def plot_pipeline_sankey(cram_data, enzyme_data, docking_results, md_results,
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -861,18 +861,18 @@ def generate_demo_data():
 
 if __name__ == '__main__':
     print("\n" + "="*80)
-    print("🎨 ADVANCED SINGLE PLOT SUITE (NO SUBPLOTS)")
+    print(" ADVANCED SINGLE PLOT SUITE (NO SUBPLOTS)")
     print("="*80)
     print("\n6 complex standalone visualizations at 700 DPI for A0 poster\n")
     
     # Generate demo data
     cram_data, enzyme_data, docking_results, md_results = generate_demo_data()
     
-    print(f"📊 Data loaded:")
-    print(f"  - CRAM molecules: {len(cram_data)}")
-    print(f"  - Enzymes: {len(enzyme_data)}")
-    print(f"  - Docking results: {len(docking_results)}")
-    print(f"  - MD simulations: {len(md_results)}\n")
+    print(f" Data loaded:")
+    print(f" - CRAM molecules: {len(cram_data)}")
+    print(f" - Enzymes: {len(enzyme_data)}")
+    print(f" - Docking results: {len(docking_results)}")
+    print(f" - MD simulations: {len(md_results)}\n")
     
     print("Generating complex single plots...\n")
     
@@ -885,19 +885,19 @@ if __name__ == '__main__':
         plot_pipeline_sankey(cram_data, enzyme_data, docking_results, md_results)
         
         print("\n" + "="*80)
-        print("✅ ALL COMPLEX SINGLE PLOTS GENERATED!")
+        print(" ALL COMPLEX SINGLE PLOTS GENERATED!")
         print("="*80)
         print("\nGenerated files:")
-        print("  1. fig1_cram_property_space_density.png - Property space + density")
-        print("  2. fig2_cram_radial_features.png - Radial feature profiles")
-        print("  3. fig3_binding_affinity_heatmap.png - Hierarchical heatmap")
-        print("  4. fig4_md_trajectory_landscape.png - Comprehensive MD view")
-        print("  5. fig5_interaction_network.png - Network graph")
-        print("  6. fig6_pipeline_sankey.png - Flow diagram")
+        print(" 1. fig1_cram_property_space_density.png - Property space + density")
+        print(" 2. fig2_cram_radial_features.png - Radial feature profiles")
+        print(" 3. fig3_binding_affinity_heatmap.png - Hierarchical heatmap")
+        print(" 4. fig4_md_trajectory_landscape.png - Comprehensive MD view")
+        print(" 5. fig5_interaction_network.png - Network graph")
+        print(" 6. fig6_pipeline_sankey.png - Flow diagram")
         print("\nAll optimized for A0 poster at 700 DPI")
         print("="*80 + "\n")
         
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n Error: {e}")
         import traceback
         traceback.print_exc()

@@ -70,14 +70,12 @@ def draw_molecule(smiles: str, size: tuple = (400, 400), highlight_cram: bool = 
 def format_validation(result: dict) -> str:
     """Format validation result as Markdown."""
     if result.get('is_cram'):
-        status = "✅ **Valid CRAM**"
-        badge = "🟢"
+        status = "**Valid CRAM**"
     else:
-        status = "❌ **Not CRAM**"
-        badge = "🔴"
+        status = "**Not CRAM**"
     
     lines = [
-        f"## {badge} Validation Result",
+        "## Validation Result",
         "",
         status,
         "",
@@ -89,8 +87,8 @@ def format_validation(result: dict) -> str:
     
     checks = result.get('checks', {})
     for name, passed in checks.items():
-        icon = "✅" if passed else "❌"
-        lines.append(f"- {icon} {name}")
+        mark = "pass" if passed else "fail"
+        lines.append(f"- [{mark}] {name}")
     
     return "\n".join(lines)
 

@@ -36,7 +36,7 @@ def parse_mgf(mgf_file):
                 mass = float(line.split('=')[1].strip().split()[0])
                 precursor_masses.append(mass)
     
-    print(f"  Found {len(precursor_masses)} MS1 spectra")
+    print(f" Found {len(precursor_masses)} MS1 spectra")
     return precursor_masses
 
 def parse_molecular_formula(formula):
@@ -81,7 +81,7 @@ def load_gnps_identifications(tsv_file):
     print(f"\nLoading GNPS identifications from {tsv_file}...")
     
     df = pd.read_csv(tsv_file, sep='\t')
-    print(f"  Total identifications: {len(df)}")
+    print(f" Total identifications: {len(df)}")
     
     results = []
     for idx, row in df.iterrows():
@@ -102,8 +102,8 @@ def load_gnps_identifications(tsv_file):
                     })
     
     result_df = pd.DataFrame(results)
-    print(f"  Valid formulas: {len(result_df)}")
-    print(f"  CRAM-like: {result_df['is_CRAM'].sum()}")
+    print(f" Valid formulas: {len(result_df)}")
+    print(f" CRAM-like: {result_df['is_CRAM'].sum()}")
     
     return result_df
 
@@ -115,10 +115,10 @@ def create_van_krevelen_comparison(surface_gnps, surface_mgf, deep_mgf, output_f
     
     # Create grid
     gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.3)
-    ax1 = fig.add_subplot(gs[0, 0])  # Surface identified
-    ax2 = fig.add_subplot(gs[0, 1])  # CRAM region zoom
-    ax3 = fig.add_subplot(gs[0, 2])  # Statistics bar chart
-    ax4 = fig.add_subplot(gs[1, :])   # Mass distribution comparison
+    ax1 = fig.add_subplot(gs[0, 0]) # Surface identified
+    ax2 = fig.add_subplot(gs[0, 1]) # CRAM region zoom
+    ax3 = fig.add_subplot(gs[0, 2]) # Statistics bar chart
+    ax4 = fig.add_subplot(gs[1,:]) # Mass distribution comparison
     
     # Colors
     surface_color = '#2E86AB'
@@ -166,7 +166,7 @@ def create_van_krevelen_comparison(surface_gnps, surface_mgf, deep_mgf, output_f
         
         # Add compound names
         for idx, row in surface_cram.iterrows():
-            name = row['Compound_Name'][:20]  # Truncate long names
+            name = row['Compound_Name'][:20] # Truncate long names
             ax2.annotate(name, (row['O/C'], row['H/C']), 
                         xytext=(5, 5), textcoords='offset points',
                         fontsize=7, alpha=0.8)
@@ -234,7 +234,7 @@ def create_van_krevelen_comparison(surface_gnps, surface_mgf, deep_mgf, output_f
                 fontsize=16, fontweight='bold', y=0.995)
     
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\n✓ Van Krevelen diagram saved: {output_file}")
+    print(f"\n Van Krevelen diagram saved: {output_file}")
     plt.close()
     
     # Print statistics
@@ -276,7 +276,7 @@ def main():
         
         # Save data
         surface_gnps.to_csv('DOM_data/van_krevelen_identified_compounds.csv', index=False)
-        print(f"✓ Data saved: DOM_data/van_krevelen_identified_compounds.csv")
+        print(f" Data saved: DOM_data/van_krevelen_identified_compounds.csv")
     else:
         print("\nERROR: No valid molecular formulas found!")
     

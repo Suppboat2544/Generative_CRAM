@@ -29,23 +29,23 @@ def validate_command(args):
     validator = CRAMValidator()
     
     print("=" * 60)
-    print("🧬 CRAM Validation")
+    print("CRAM Validation")
     print("=" * 60)
     
     for smiles in args.smiles:
         print(f"\nSMILES: {smiles}")
         result = validator.validate_smiles(smiles)
         
-        print(f"  Is CRAM: {'✅ Yes' if result['is_cram'] else '❌ No'}")
-        print(f"  COOH count: {result['n_cooh']}")
-        print(f"  Has alicyclic: {result['has_alicyclic']}")
-        print(f"  Aliphatic %: {result['aliphatic_pct']:.1%}")
-        print(f"  MW: {result['mw']:.1f} Da")
+        print(f"Is CRAM: {'Yes' if result['is_cram'] else 'No'}")
+        print(f"COOH count: {result['n_cooh']}")
+        print(f"Has alicyclic: {result['has_alicyclic']}")
+        print(f"Aliphatic %: {result['aliphatic_pct']:.1%}")
+        print(f"MW: {result['mw']:.1f} Da")
         
         if result['failures']:
-            print("  Failures:")
+            print("Failures:")
             for failure in result['failures']:
-                print(f"    • {failure}")
+                print(f"- {failure}")
     
     print("\n" + "=" * 60)
 
@@ -177,7 +177,7 @@ def ui_command(args):
     from ui.app import launch_app
     
     print("=" * 60)
-    print("🧬 CRAM Generator - User Interface")
+    print("CRAM Generator - User Interface")
     print("=" * 60)
     print(f"Starting server on port {args.port}...")
     print("=" * 60)
@@ -194,13 +194,13 @@ def features_command(args):
     extractor = DeepCRAMFeatureExtractor()
     
     print("=" * 60)
-    print("🔬 Feature Extraction")
+    print("Feature Extraction")
     print("=" * 60)
     
     for smiles in args.smiles:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
-            print(f"\n❌ Invalid SMILES: {smiles}")
+            print(f"\nInvalid SMILES: {smiles}")
             continue
         
         packed = extractor.extract(mol)
@@ -210,12 +210,12 @@ def features_command(args):
         atom_features = packed["atom_features"]
 
         print(f"\nSMILES: {smiles}")
-        print(f"  Atoms: {mol.GetNumAtoms()}")
-        print(f"  Atom features shape: {atom_features.shape}")
-        print(f"  Non-zero features: {np.count_nonzero(atom_features):,}")
+        print(f"Atoms: {mol.GetNumAtoms()}")
+        print(f"Atom features shape: {atom_features.shape}")
+        print(f"Non-zero features: {np.count_nonzero(atom_features):,}")
 
         if args.verbose:
-            print(f"  Feature dim per atom: {atom_features.shape[1]} (expected 163)")
+            print(f"Feature dim per atom: {atom_features.shape[1]} (expected 163)")
     
     print("\n" + "=" * 60)
 
@@ -225,7 +225,7 @@ def info_command(args):
     import platform
     
     print("=" * 60)
-    print("🧬 CRAM Generator - System Information")
+    print("CRAM Generator - System Information")
     print("=" * 60)
     
     print(f"\nPython: {platform.python_version()}")
@@ -242,7 +242,7 @@ def info_command(args):
         if hasattr(torch.backends, 'mps'):
             print(f"MPS available: {torch.backends.mps.is_available()}")
             if torch.backends.mps.is_available():
-                print("  ✅ Apple Silicon GPU acceleration enabled")
+                print("Apple Silicon GPU acceleration enabled")
     except ImportError:
         print("\nPyTorch: Not installed")
     
@@ -271,7 +271,7 @@ def info_command(args):
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="🧬 CRAM Generator - Deep Learning for Marine DOM",
+        description="CRAM Generator - Deep Learning for Marine DOM",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

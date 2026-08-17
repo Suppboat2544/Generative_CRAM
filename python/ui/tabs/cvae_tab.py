@@ -17,19 +17,19 @@ from .utils import draw_molecule
 def create_cvae_tab():
     """Create the CVAE generation tab interface."""
     
-    with gr.TabItem("🎯 CVAE Generate", id="cvae_generate"):
+    with gr.TabItem("CVAE Generate", id="cvae_generate"):
         gr.Markdown("""
         ### Property-Conditioned CVAE Generation
         
         Generate CRAM molecules with **specific property targets** using the 
         Conditional Variational Autoencoder (CVAE).
         
-        ⚠️ **Requires trained CVAE checkpoint**
+        **Requires trained CVAE checkpoint**
         """)
         
         with gr.Row():
             with gr.Column(scale=1):
-                gr.Markdown("### 🎛️ Property Conditions")
+                gr.Markdown("### Property Conditions")
                 
                 cvae_count = gr.Slider(
                     minimum=10, maximum=100000, value=1000, step=100,
@@ -59,19 +59,19 @@ def create_cvae_tab():
                 
                 cvae_benzene = gr.Checkbox(label="Target Benzene-Containing", value=False)
                 
-                with gr.Accordion("⚙️ Advanced", open=False):
+                with gr.Accordion(" Advanced", open=False):
                     cvae_temperature = gr.Slider(0.1, 2.0, value=0.8, step=0.1, label="Temperature")
                     cvae_batch_size = gr.Slider(32, 512, value=256, step=32, label="Batch Size")
                     cvae_checkpoint = gr.Textbox(label="Checkpoint Path", placeholder="models/cvae_best.pt")
                 
-                cvae_btn = gr.Button("🚀 Generate", variant="primary", size="lg")
+                cvae_btn = gr.Button("Generate", variant="primary", size="lg")
             
             with gr.Column(scale=1):
-                gr.Markdown("### 📊 Results")
+                gr.Markdown("### Results")
                 cvae_results = gr.Markdown("Configure and click Generate...")
                 cvae_download = gr.File(label="Download CSV", visible=True)
                 
-                gr.Markdown("### 🧬 Samples")
+                gr.Markdown("### Samples")
                 cvae_gallery = gr.Image(label="", height=350, show_label=False)
         
         def generate_cvae(count, cooh_min, cooh_max, ring_class, mw_min, mw_max,
@@ -93,14 +93,14 @@ def create_cvae_tab():
                             break
                 
                 if not checkpoint or not os.path.exists(checkpoint):
-                    return "❌ No checkpoint found", None, None
+                    return "No checkpoint found", None, None
                 
                 device = get_device()
                 ckpt = torch.load(checkpoint, map_location=device)
                 
                 vocab = ckpt.get('vocab')
                 if not vocab:
-                    return "❌ Invalid checkpoint", None, None
+                    return "Invalid checkpoint", None, None
                 
                 tokenizer = SELFIESTokenizer(max_len=100)
                 tokenizer.token_to_idx = vocab
@@ -133,7 +133,7 @@ def create_cvae_tab():
                 df = generator.generate_unique(count, sampler, temperature, batch_size)
                 
                 if df is None or len(df) == 0:
-                    return "❌ No valid molecules generated", None, None
+                    return "No valid molecules generated", None, None
                 
                 # Save CSV
                 temp_file = tempfile.NamedTemporaryFile(
@@ -150,13 +150,13 @@ def create_cvae_tab():
                 row2 = np.hstack(images[3:6])
                 gallery = np.vstack([row1, row2])
                 
-                summary = f"## ✅ Generated {len(df)} molecules\n\n" \
+                summary = f"## Generated {len(df)} molecules\n\n" \
                          f"COOH: {cooh_min}-{cooh_max}, Ring: {ring_class}, MW: {mw_min}-{mw_max}"
                 
                 return summary, temp_file.name, gallery
                 
             except Exception as e:
-                return f"❌ Error: {str(e)}", None, None
+                return f"Error: {str(e)}", None, None
         
         cvae_btn.click(
             fn=generate_cvae,

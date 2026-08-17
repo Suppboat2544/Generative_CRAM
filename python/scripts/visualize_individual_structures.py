@@ -123,11 +123,11 @@ def create_individual_structure_plot(mol_data, properties, output_path, color_sc
     
     # Add compliance badge
     if properties['compliant']:
-        badge_text = "✓ CRAM COMPLIANT"
+        badge_text = " CRAM COMPLIANT"
         badge_color = '#27ae60'
         badge_text_color = 'white'
     else:
-        badge_text = "⚠ PARTIAL COMPLIANCE"
+        badge_text = " PARTIAL COMPLIANCE"
         badge_color = '#e67e22'
         badge_text_color = 'white'
     
@@ -147,7 +147,7 @@ def create_individual_structure_plot(mol_data, properties, output_path, color_sc
     # Save figure
     plt.savefig(output_path, dpi=700, bbox_inches='tight',
                 facecolor='white', edgecolor='none', pad_inches=0.2)
-    print(f"✓ Saved: {output_path}")
+    print(f" Saved: {output_path}")
     plt.close()
 
 def create_radar_chart_only(properties_list, names, output_path):
@@ -165,17 +165,17 @@ def create_radar_chart_only(properties_list, names, output_path):
     data = []
     for props in properties_list:
         normalized = [
-            props['cooh'] / 5.0,  # Max 5 COOH
-            props['aliphatic'] / 100.0,  # Max 100%
-            props['oc_ratio'] / 0.6,  # Target max 0.6
-            props['rings'] / 4.0,  # Max 4 rings
-            props['mw'] / 400.0  # Max 400 Da
+            props['cooh'] / 5.0, # Max 5 COOH
+            props['aliphatic'] / 100.0, # Max 100%
+            props['oc_ratio'] / 0.6, # Target max 0.6
+            props['rings'] / 4.0, # Max 4 rings
+            props['mw'] / 400.0 # Max 400 Da
         ]
         data.append(normalized)
     
     # Compute angle for each axis
     angles = [n / float(N) * 2 * np.pi for n in range(N)]
-    data = [d + [d[0]] for d in data]  # Close the plot
+    data = [d + [d[0]] for d in data] # Close the plot
     angles += angles[:1]
     
     # Plot
@@ -227,7 +227,7 @@ def create_radar_chart_only(properties_list, names, output_path):
     # Save
     plt.savefig(output_path, dpi=700, bbox_inches='tight',
                 facecolor='white', edgecolor='none', pad_inches=0.3)
-    print(f"✓ Saved: {output_path}")
+    print(f" Saved: {output_path}")
     plt.close()
 
 # Define the three example molecules
@@ -326,10 +326,10 @@ for i, (mol_data, props) in enumerate(zip(molecules, properties_list)):
     
     # Compliance badge
     if props['compliant']:
-        badge_text = "✓ COMPLIANT"
+        badge_text = " COMPLIANT"
         badge_color = '#27ae60'
     else:
-        badge_text = "⚠ PARTIAL"
+        badge_text = " PARTIAL"
         badge_color = '#e67e22'
     
     ax.text(0.5, -0.18, badge_text, transform=ax.transAxes,
@@ -340,16 +340,16 @@ for i, (mol_data, props) in enumerate(zip(molecules, properties_list)):
 
 plt.savefig('figures/representative_structures_comparison_700dpi.png', 
             dpi=700, bbox_inches='tight', facecolor='white', edgecolor='none')
-print(f"✓ Saved: figures/representative_structures_comparison_700dpi.png")
+print(f" Saved: figures/representative_structures_comparison_700dpi.png")
 plt.close()
 
 print("\n" + "="*80)
 print("All individual visualizations complete!")
 print("="*80)
 print("\nGenerated files:")
-print("  1. figures/representative_structure_example1_700dpi.png")
-print("  2. figures/representative_structure_example2_700dpi.png")
-print("  3. figures/representative_structure_example3_700dpi.png")
-print("  4. figures/representative_structures_radar_700dpi.png")
-print("  5. figures/representative_structures_comparison_700dpi.png")
+print(" 1. figures/representative_structure_example1_700dpi.png")
+print(" 2. figures/representative_structure_example2_700dpi.png")
+print(" 3. figures/representative_structure_example3_700dpi.png")
+print(" 4. figures/representative_structures_radar_700dpi.png")
+print(" 5. figures/representative_structures_comparison_700dpi.png")
 print("="*80 + "\n")

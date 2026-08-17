@@ -24,7 +24,7 @@ def make_cho_dom(n_target, env, oc_center, hc_center):
         elif env == "surface":
             oc_target = np.random.normal(oc_center, 0.10)
             hc_target = np.random.normal(hc_center, 0.18)
-        else:  # coastal
+        else: # coastal
             oc_target = np.random.normal(oc_center, 0.12)
             hc_target = np.random.normal(hc_center, 0.20)
 
@@ -80,13 +80,13 @@ def make_cho_dom(n_target, env, oc_center, hc_center):
 
 # Generate formulas with distinct distributions
 print("\nGenerating validated CHO formulas...")
-df_deep    = make_cho_dom(2500, "deep",    oc_center=0.35, hc_center=1.05)
+df_deep = make_cho_dom(2500, "deep", oc_center=0.35, hc_center=1.05)
 df_surface = make_cho_dom(2500, "surface", oc_center=0.45, hc_center=1.30)
 df_coastal = make_cho_dom(2500, "coastal", oc_center=0.55, hc_center=1.55)
 
-print(f"✓ Deep sea: {len(df_deep)} valid formulas generated")
-print(f"✓ Surface sea: {len(df_surface)} valid formulas generated")
-print(f"✓ Coastal sea: {len(df_coastal)} valid formulas generated")
+print(f" Deep sea: {len(df_deep)} valid formulas generated")
+print(f" Surface sea: {len(df_surface)} valid formulas generated")
+print(f" Coastal sea: {len(df_coastal)} valid formulas generated")
 
 def add_shared(df_list, frac=0.15):
     base = df_list[0]
@@ -106,10 +106,10 @@ df = pd.concat([df_deep, df_surface, df_coastal], ignore_index=True)
 
 # =============== 2. GROUP LABELS ===============
 
-g_counts   = df.groupby("formula")["env"].nunique()
+g_counts = df.groupby("formula")["env"].nunique()
 common_ids = set(g_counts[g_counts == 3].index)
 
-deep_only    = set(df_deep.loc[~df_deep["formula"].isin(common_ids), "formula"])
+deep_only = set(df_deep.loc[~df_deep["formula"].isin(common_ids), "formula"])
 surface_only = set(df_surface.loc[~df_surface["formula"].isin(common_ids), "formula"])
 coastal_only = set(df_coastal.loc[~df_coastal["formula"].isin(common_ids), "formula"])
 
@@ -130,10 +130,10 @@ df["group"] = df["formula"].map(group_label)
 print("\n" + "="*75)
 print("Formula Distribution Across Environments:")
 print("="*75)
-print(f"Coastal sea only:  {len(df[df['group']=='coastal'])} formulas")
-print(f"Surface sea only:  {len(df[df['group']=='surface'])} formulas")
-print(f"Deep sea only:     {len(df[df['group']=='deep'])} formulas")
-print(f"Common to all:     {len(df[df['group']=='common'])} formulas (found in all 3 environments)")
+print(f"Coastal sea only: {len(df[df['group']=='coastal'])} formulas")
+print(f"Surface sea only: {len(df[df['group']=='surface'])} formulas")
+print(f"Deep sea only: {len(df[df['group']=='deep'])} formulas")
+print(f"Common to all: {len(df[df['group']=='common'])} formulas (found in all 3 environments)")
 print("="*75)
 
 # =============== 3. CRAM REGION ====================
@@ -151,7 +151,7 @@ df["in_cram"] = poly_path.contains_points(df[["O_C", "H_C"]].values)
 # =============== 4. ISOMER MODELS =========
 
 df["mass"] = 12*df["C"] + df["H"] + 16*df["O"]
-base_iso   = (df["mass"] / 350.0)**1.15 * (df["C"] / 20.0)**0.3
+base_iso = (df["mass"] / 350.0)**1.15 * (df["C"] / 20.0)**0.3
 
 df["isomers_pubchem"] = base_iso.clip(0.5, 5.0)
 df["isomers_pubchem_cram"] = df["isomers_pubchem"].copy()
@@ -182,7 +182,7 @@ print("="*75)
 
 print("\nSaving dataset to CSV...")
 df.to_csv("dom_cram_dataset.csv", index=False)
-print("✓ Saved: dom_cram_dataset.csv")
+print(" Saved: dom_cram_dataset.csv")
 
 # Print CRAM statistics
 print("\n" + "="*75)
@@ -213,10 +213,10 @@ print("="*75 + "\n")
 # =============== 7. COLORS =======================================
 
 palette = {
-    "deep":    "#f4a442",
+    "deep": "#f4a442",
     "surface": "#5ba3d0",
     "coastal": "#3d9970",
-    "common":  "#3a3a3a",
+    "common": "#3a3a3a",
 }
 
 # =============== 8. PLOTTING FUNCTION ================
@@ -342,7 +342,7 @@ def plot_vkd_with_marginals(size_col, title, filename, panel_label):
     
     plt.tight_layout()
     plt.savefig(filename, dpi=700, bbox_inches='tight')
-    print(f"✓ Saved: {filename}")
+    print(f" Saved: {filename}")
     plt.close()
 
 # =============== 9. SAVE INDIVIDUAL PLOTS ================
@@ -413,13 +413,13 @@ ax.set_title("Impact of CRAM Database on Isomer Identification",
 sns.despine(fig=fig, ax=ax, trim=True)
 plt.tight_layout()
 plt.savefig("isomer_comparison.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: isomer_comparison.png")
+print(" Saved: isomer_comparison.png")
 plt.close()
 
 print("\n" + "="*75)
 print("COMPLETE! Generated files:")
-print("  1. dom_cram_dataset.csv           - Full validated CHO dataset")
-print("  2. vkd_pubchem_only.png           - a) PubChem database VKD (700 DPI)")
-print("  3. vkd_pubchem_cram.png           - b) PubChem+CRAM database VKD (700 DPI)")
-print("  4. isomer_comparison.png          - c) Isomer distribution (700 DPI)")
+print(" 1. dom_cram_dataset.csv - Full validated CHO dataset")
+print(" 2. vkd_pubchem_only.png - a) PubChem database VKD (700 DPI)")
+print(" 3. vkd_pubchem_cram.png - b) PubChem+CRAM database VKD (700 DPI)")
+print(" 4. isomer_comparison.png - c) Isomer distribution (700 DPI)")
 print("="*75 + "\n")

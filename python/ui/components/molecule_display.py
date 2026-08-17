@@ -94,7 +94,7 @@ def create_property_badges(properties: Dict[str, Any]) -> str:
     
     if 'valid' in properties:
         valid = properties['valid']
-        status = "✓ Valid" if valid else "✗ Invalid"
+        status = " Valid" if valid else " Invalid"
         badges.append(status)
     
     return " | ".join(badges)
@@ -113,7 +113,7 @@ def create_molecule_gallery(smiles_list: list, columns: int = 4) -> str:
     """
     html = "<div style='display: grid; grid-template-columns: repeat({}, 1fr); gap: 10px;'>".format(columns)
     
-    for i, smiles in enumerate(smiles_list[:20]):  # Limit to 20
+    for i, smiles in enumerate(smiles_list[:20]): # Limit to 20
         img = draw_molecule_image(smiles, size=(150, 150))
         if img:
             html += f"""

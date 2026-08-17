@@ -34,11 +34,11 @@ class ModelConfig:
     """Model architecture configuration"""
     
     # Model dimensions
-    NODE_FEAT_DIM = 73  # 73D for synthetic, 88D for unified
+    NODE_FEAT_DIM = 73 # 73D for synthetic, 88D for unified
     EDGE_FEAT_DIM = 6
     HIDDEN_DIM = 1024
     LATENT_DIM = 512
-    VOCAB_SIZE = 100  # SELFIES vocabulary size
+    VOCAB_SIZE = 100 # SELFIES vocabulary size
     
     # Transformer settings
     NUM_LAYERS = 8
@@ -55,8 +55,8 @@ class ModelConfig:
     BATCH_SIZE = 16
     LEARNING_RATE = 1e-4
     WEIGHT_DECAY = 1e-5
-    BETA_START = 0.001  # KL annealing start
-    BETA_END = 0.05     # KL annealing end
+    BETA_START = 0.001 # KL annealing start
+    BETA_END = 0.05 # KL annealing end
     
     # CRAM-specific settings
     MIN_CARBOXYL_GROUPS = 1
@@ -106,7 +106,7 @@ class GraphEncoder(nn.Module):
         
         # Input projections
         self.input_proj = nn.Linear(node_feat_dim, hidden_dim)
-        self.edge_proj = nn.Linear(6, hidden_dim)  # 6D edge features
+        self.edge_proj = nn.Linear(6, hidden_dim) # 6D edge features
         
         # GAT layers with edge features
         self.gat_layers = nn.ModuleList([
@@ -153,7 +153,7 @@ class GraphEncoder(nn.Module):
             cram_features: [batch, 2]
         """
         # Project node features
-        h = self.input_proj(g.ndata['feat'])  # [num_nodes, hidden_dim]
+        h = self.input_proj(g.ndata['feat']) # [num_nodes, hidden_dim]
         
         # Process edge features (optional)
         if 'feat' in g.edata:
@@ -163,8 +163,8 @@ class GraphEncoder(nn.Module):
         
         # GAT layers with residual connections
         for gat, ln in zip(self.gat_layers, self.layer_norms):
-            h_new = gat(g, h).flatten(1)  # [num_nodes, hidden_dim]
-            h = ln(h + h_new)  # Residual connection + LayerNorm
+            h_new = gat(g, h).flatten(1) # [num_nodes, hidden_dim]
+            h = ln(h + h_new) # Residual connection + LayerNorm
             h = F.relu(h)
         
         # Hierarchical pooling
@@ -172,17 +172,17 @@ class GraphEncoder(nn.Module):
             g.ndata['h'] = h
             
             # 1. Mean pooling: average over all nodes
-            mean_pool = dgl.mean_nodes(g, 'h')  # [batch, hidden_dim]
+            mean_pool = dgl.mean_nodes(g, 'h') # [batch, hidden_dim]
             
             # 2. Max pooling: max over all nodes
-            max_pool = dgl.max_nodes(g, 'h')  # [batch, hidden_dim]
+            max_pool = dgl.max_nodes(g, 'h') # [batch, hidden_dim]
             
             # 3. Attention-weighted pooling
-            attn_scores = self.attention_pool(h)  # [num_nodes, 1]
+            attn_scores = self.attention_pool(h) # [num_nodes, 1]
             g.ndata['attn'] = attn_scores
-            attn_weights = dgl.softmax_nodes(g, 'attn')  # Normalize per graph
+            attn_weights = dgl.softmax_nodes(g, 'attn') # Normalize per graph
             g.ndata['h_attn'] = h * attn_weights
-            attn_pool = dgl.sum_nodes(g, 'h_attn')  # [batch, hidden_dim]
+            attn_pool = dgl.sum_nodes(g, 'h_attn') # [batch, hidden_dim]
             
             # Combine all pooling strategies
             graph_embedding = torch.cat([mean_pool, max_pool, attn_pool], dim=-1)
@@ -191,22 +191,22 @@ class GraphEncoder(nn.Module):
             # Extract CRAM-specific features for conditioning
             # These are from node feature indices -7 and -6
             node_feats = g.ndata['feat']
-            carboxyl_features = node_feats[:, -7]  # Is carboxyl atom
-            aliphatic_features = node_feats[:, -6]  # Is aliphatic carbon
+            carboxyl_features = node_feats[:, -7] # Is carboxyl atom
+            aliphatic_features = node_feats[:, -6] # Is aliphatic carbon
             
             g.ndata['cram_c'] = carboxyl_features.unsqueeze(-1)
             g.ndata['cram_a'] = aliphatic_features.unsqueeze(-1)
             
             # Aggregate CRAM features per graph
-            carboxyl_count = dgl.sum_nodes(g, 'cram_c')  # [batch, 1]
-            aliphatic_ratio = dgl.mean_nodes(g, 'cram_a')  # [batch, 1]
+            carboxyl_count = dgl.sum_nodes(g, 'cram_c') # [batch, 1]
+            aliphatic_ratio = dgl.mean_nodes(g, 'cram_a') # [batch, 1]
             
             cram_features = torch.cat([carboxyl_count, aliphatic_ratio], dim=-1)
             # [batch, 2]
         
         # Project to latent distribution parameters
-        mu = self.fc_mu(graph_embedding)  # [batch, latent_dim]
-        logvar = self.fc_logvar(graph_embedding)  # [batch, latent_dim]
+        mu = self.fc_mu(graph_embedding) # [batch, latent_dim]
+        logvar = self.fc_logvar(graph_embedding) # [batch, latent_dim]
         
         return mu, logvar, cram_features
 
@@ -253,7 +253,7 @@ class TransformerDecoder(nn.Module):
         self.latent_dim = latent_dim
         
         # CRAM conditioning embeddings
-        self.cram_proj = nn.Linear(2, 32)  # 2D CRAM features → 32D embedding
+        self.cram_proj = nn.Linear(2, 32) # 2D CRAM features → 32D embedding
         
         # Latent to hidden projection (with CRAM conditioning)
         self.latent_proj = nn.Linear(latent_dim + 32, hidden_dim)
@@ -275,7 +275,7 @@ class TransformerDecoder(nn.Module):
             dim_feedforward=hidden_dim * 4,
             dropout=dropout,
             batch_first=True,
-            norm_first=True  # Pre-norm for better stability
+            norm_first=True # Pre-norm for better stability
         )
         self.transformer_decoder = nn.TransformerDecoder(
             decoder_layer, num_layers
@@ -309,15 +309,15 @@ class TransformerDecoder(nn.Module):
         batch_size, seq_len = tokens.shape
         
         # CRAM conditioning
-        cram_emb = self.cram_proj(cram_features)  # [batch, 32]
+        cram_emb = self.cram_proj(cram_features) # [batch, 32]
         
         # Concatenate latent with CRAM conditioning
         z_conditioned = torch.cat([latent_z, cram_emb], dim=-1)
         # [batch, latent_dim + 32]
         
         # Embed tokens and add positional encoding
-        token_emb = self.token_embedding(tokens)  # [batch, seq_len, hidden_dim]
-        token_emb = token_emb + self.pos_encoding[:, :seq_len, :]
+        token_emb = self.token_embedding(tokens) # [batch, seq_len, hidden_dim]
+        token_emb = token_emb + self.pos_encoding[:,:seq_len,:]
         
         # Prepare memory (conditioned latent representation)
         memory = self.latent_proj(z_conditioned).unsqueeze(1)
@@ -329,11 +329,11 @@ class TransformerDecoder(nn.Module):
             memory=memory,
             tgt_mask=tgt_mask,
             tgt_key_padding_mask=tgt_key_padding_mask
-        )  # [batch, seq_len, hidden_dim]
+        ) # [batch, seq_len, hidden_dim]
         
         # Normalize and project to vocabulary
         output = self.output_norm(output)
-        logits = self.output_proj(output)  # [batch, seq_len, vocab_size]
+        logits = self.output_proj(output) # [batch, seq_len, vocab_size]
         
         return logits
     
@@ -404,7 +404,7 @@ class TransformerVAE(nn.Module):
             node_feat_dim, hidden_dim, latent_dim, num_layers
         )
         self.template_proj = nn.Linear(latent_dim, latent_dim)
-        self.use_template_conditioning = True  # Toggle on/off
+        self.use_template_conditioning = True # Toggle on/off
         
     def reparameterize(
         self,
@@ -457,7 +457,7 @@ class TransformerVAE(nn.Module):
             template_mu, _, _ = self.template_encoder(template_graph)
             template_z = self.template_proj(template_mu)
             # Blend latent with template
-            z = z + 0.5 * template_z  # Weighted combination
+            z = z + 0.5 * template_z # Weighted combination
         
         # Decode to SELFIES
         logits = self.decoder(tokens, z, cram_features)
@@ -524,7 +524,7 @@ class TransformerVAE(nn.Module):
                 
                 # Get next token logits
                 logits = self.decoder(sequences, z, cram_features, tgt_mask)
-                next_token_logits = logits[:, -1, :] / temperature
+                next_token_logits = logits[:, -1,:] / temperature
                 
                 # Sample next token
                 probs = F.softmax(next_token_logits, dim=-1)
@@ -599,7 +599,7 @@ def vae_loss(
     # KL = -0.5 * sum(1 + log(σ²) - μ² - σ²)
     kl_loss = -0.5 * torch.sum(
         1 + logvar - mu.pow(2) - logvar.exp()
-    ) / mu.size(0)  # Average over batch
+    ) / mu.size(0) # Average over batch
     
     # Total loss with annealing
     total_loss = recon_loss + beta * kl_loss
@@ -660,49 +660,49 @@ def print_model_summary(model: TransformerVAE):
     print("=" * 80)
     print()
     
-    print("🏗️  Architecture: Transformer-VAE with Graph Neural Networks")
+    print(" Architecture: Transformer-VAE with Graph Neural Networks")
     print()
     
     # Encoder
     print("1. GRAPH ENCODER (GAT-based)")
-    print("   " + "-" * 70)
-    print(f"   Input:")
-    print(f"      • Node features: {model.encoder.node_feat_dim}D")
-    print(f"      • Edge features: 6D (bond type, aromatic, conjugated, ring)")
-    print(f"   Architecture:")
-    print(f"      • Input projection: {model.encoder.node_feat_dim}D → {model.encoder.hidden_dim}D")
-    print(f"      • Edge projection: 6D → {model.encoder.hidden_dim}D")
-    print(f"      • GAT layers: 3 layers, 8 heads each")
-    print(f"      • Hierarchical pooling: Mean + Max + Attention")
-    print(f"   Output:")
-    print(f"      • Latent distribution: μ, σ² ∈ ℝ^{model.encoder.latent_dim}")
-    print(f"      • CRAM features: [carboxyl_count, aliphatic_ratio] ∈ ℝ^2")
+    print(" " + "-" * 70)
+    print(f" Input:")
+    print(f" • Node features: {model.encoder.node_feat_dim}D")
+    print(f" • Edge features: 6D (bond type, aromatic, conjugated, ring)")
+    print(f" Architecture:")
+    print(f" • Input projection: {model.encoder.node_feat_dim}D → {model.encoder.hidden_dim}D")
+    print(f" • Edge projection: 6D → {model.encoder.hidden_dim}D")
+    print(f" • GAT layers: 3 layers, 8 heads each")
+    print(f" • Hierarchical pooling: Mean + Max + Attention")
+    print(f" Output:")
+    print(f" • Latent distribution: μ, σ² ∈ ℝ^{model.encoder.latent_dim}")
+    print(f" • CRAM features: [carboxyl_count, aliphatic_ratio] ∈ ℝ^2")
     print()
     
     # Decoder
     print("2. TRANSFORMER DECODER (Autoregressive)")
-    print("   " + "-" * 70)
-    print(f"   Input:")
-    print(f"      • Latent vector: {model.latent_dim}D")
-    print(f"      • CRAM conditioning: 2D → 32D embedding")
-    print(f"      • Token embeddings: {model.decoder.vocab_size} vocab → {model.decoder.hidden_dim}D")
-    print(f"   Architecture:")
-    print(f"      • Latent projection: {model.latent_dim + 32}D → {model.decoder.hidden_dim}D")
-    print(f"      • Positional encoding: Learnable [{model.decoder.pos_encoding.size(1)}, {model.decoder.hidden_dim}D]")
-    print(f"      • Transformer layers: 8 layers, 8 heads, 4096D feedforward")
-    print(f"      • Pre-norm architecture for stability")
-    print(f"   Output:")
-    print(f"      • Token logits: {model.decoder.vocab_size} classes (SELFIES vocabulary)")
+    print(" " + "-" * 70)
+    print(f" Input:")
+    print(f" • Latent vector: {model.latent_dim}D")
+    print(f" • CRAM conditioning: 2D → 32D embedding")
+    print(f" • Token embeddings: {model.decoder.vocab_size} vocab → {model.decoder.hidden_dim}D")
+    print(f" Architecture:")
+    print(f" • Latent projection: {model.latent_dim + 32}D → {model.decoder.hidden_dim}D")
+    print(f" • Positional encoding: Learnable [{model.decoder.pos_encoding.size(1)}, {model.decoder.hidden_dim}D]")
+    print(f" • Transformer layers: 8 layers, 8 heads, 4096D feedforward")
+    print(f" • Pre-norm architecture for stability")
+    print(f" Output:")
+    print(f" • Token logits: {model.decoder.vocab_size} classes (SELFIES vocabulary)")
     print()
     
     # Latent space
     print("3. LATENT SPACE")
-    print("   " + "-" * 70)
-    print(f"   Dimension: {model.latent_dim}D")
-    print(f"   Distribution: q(z|x) = N(μ, σ²)")
-    print(f"   Prior: p(z) = N(0, I)")
-    print(f"   Reparameterization: z = μ + σ * ε, ε ~ N(0, 1)")
-    print(f"   KL annealing: β ∈ [0.001, 0.05] (cyclical)")
+    print(" " + "-" * 70)
+    print(f" Dimension: {model.latent_dim}D")
+    print(f" Distribution: q(z|x) = N(μ, σ²)")
+    print(f" Prior: p(z) = N(0, I)")
+    print(f" Reparameterization: z = μ + σ * ε, ε ~ N(0, 1)")
+    print(f" KL annealing: β ∈ [0.001, 0.05] (cyclical)")
     print()
     
     # Parameters
@@ -710,41 +710,41 @@ def print_model_summary(model: TransformerVAE):
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     
     print("4. MODEL STATISTICS")
-    print("   " + "-" * 70)
-    print(f"   Total parameters: {total_params:,}")
-    print(f"   Trainable parameters: {trainable_params:,}")
-    print(f"   Model size: ~{total_params * 4 / (1024**2):.1f} MB (FP32)")
+    print(" " + "-" * 70)
+    print(f" Total parameters: {total_params:,}")
+    print(f" Trainable parameters: {trainable_params:,}")
+    print(f" Model size: ~{total_params * 4 / (1024**2):.1f} MB (FP32)")
     print()
     
     # Training info
     print("5. TRAINING CONFIGURATION")
-    print("   " + "-" * 70)
-    print(f"   Loss: Reconstruction + β * KL Divergence")
-    print(f"   Optimizer: AdamW (lr=1e-4, weight_decay=1e-5)")
-    print(f"   Scheduler: ReduceLROnPlateau (patience=5)")
-    print(f"   Batch size: 16")
-    print(f"   Max sequence length: 150")
-    print(f"   KL annealing: Cyclical (6 cycles, ratio=0.5)")
+    print(" " + "-" * 70)
+    print(f" Loss: Reconstruction + β * KL Divergence")
+    print(f" Optimizer: AdamW (lr=1e-4, weight_decay=1e-5)")
+    print(f" Scheduler: ReduceLROnPlateau (patience=5)")
+    print(f" Batch size: 16")
+    print(f" Max sequence length: 150")
+    print(f" KL annealing: Cyclical (6 cycles, ratio=0.5)")
     print()
     
     # CRAM-specific
     print("6. CRAM-SPECIFIC FEATURES")
-    print("   " + "-" * 70)
-    print(f"   Node features (73D/88D):")
-    print(f"      • Base features: 45D (atomic, structural, electronic)")
-    print(f"      • Synthetic C3/C4: 13D (stereochemistry, chain properties)")
-    print(f"      • Marine DOM: 15D (oxidation, degradation, photo-oxidation)")
-    print(f"   CRAM conditioning:")
-    print(f"      • Carboxyl count (target: ≥1)")
-    print(f"      • Aliphatic ratio (target: ≥70%)")
-    print(f"   Generation modes:")
-    print(f"      • Similarity: Stay close to templates (Tanimoto >0.7)")
-    print(f"      • Diversity: Explore chemical space (Tanimoto <0.4)")
-    print(f"      • Balanced: Moderate novelty (Tanimoto ~0.5-0.6)")
+    print(" " + "-" * 70)
+    print(f" Node features (73D/88D):")
+    print(f" • Base features: 45D (atomic, structural, electronic)")
+    print(f" • Synthetic C3/C4: 13D (stereochemistry, chain properties)")
+    print(f" • Marine DOM: 15D (oxidation, degradation, photo-oxidation)")
+    print(f" CRAM conditioning:")
+    print(f" • Carboxyl count (target: ≥1)")
+    print(f" • Aliphatic ratio (target: ≥70%)")
+    print(f" Generation modes:")
+    print(f" • Similarity: Stay close to templates (Tanimoto >0.7)")
+    print(f" • Diversity: Explore chemical space (Tanimoto <0.4)")
+    print(f" • Balanced: Moderate novelty (Tanimoto ~0.5-0.6)")
     print()
     
     print("=" * 80)
-    print("✅ Model architecture summary complete")
+    print(" Model architecture summary complete")
     print("=" * 80)
 
 
@@ -770,7 +770,7 @@ if __name__ == "__main__":
     print_model_summary(model)
     
     # Example forward pass
-    print("\n📊 Example forward pass:")
+    print("\n Example forward pass:")
     print("-" * 80)
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -796,25 +796,25 @@ if __name__ == "__main__":
     logits, mu, logvar, cram_features, _ = model(g, tokens)
     
     print(f"Input:")
-    print(f"   Graph: {num_nodes} nodes, {num_edges} edges")
-    print(f"   Tokens: {tokens.shape}")
+    print(f" Graph: {num_nodes} nodes, {num_edges} edges")
+    print(f" Tokens: {tokens.shape}")
     print()
     print(f"Output:")
-    print(f"   Logits: {logits.shape}")
-    print(f"   Latent (μ): {mu.shape}")
-    print(f"   Latent (log σ²): {logvar.shape}")
-    print(f"   CRAM features: {cram_features.shape}")
+    print(f" Logits: {logits.shape}")
+    print(f" Latent (μ): {mu.shape}")
+    print(f" Latent (log σ²): {logvar.shape}")
+    print(f" CRAM features: {cram_features.shape}")
     print()
     
     # Calculate loss
     beta = 0.01
     total_loss, recon_loss, kl_loss = vae_loss(logits, tokens, mu, logvar, beta)
     print(f"Loss:")
-    print(f"   Total: {total_loss.item():.4f}")
-    print(f"   Reconstruction: {recon_loss.item():.4f}")
-    print(f"   KL (β={beta}): {kl_loss.item():.4f}")
+    print(f" Total: {total_loss.item():.4f}")
+    print(f" Reconstruction: {recon_loss.item():.4f}")
+    print(f" KL (β={beta}): {kl_loss.item():.4f}")
     print()
     
     print("=" * 80)
-    print("✅ Model verification complete - Architecture ready for visualization!")
+    print(" Model verification complete - Architecture ready for visualization!")
     print("=" * 80)

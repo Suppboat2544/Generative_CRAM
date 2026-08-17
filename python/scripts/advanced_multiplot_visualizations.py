@@ -92,7 +92,7 @@ def create_comprehensive_cram_analysis(
     gs = GridSpec(4, 4, figure=fig, hspace=0.4, wspace=0.4,
                   left=0.05, right=0.98, top=0.94, bottom=0.05)
     
-    print(f"📊 Generating comprehensive CRAM analysis...")
+    print(f" Generating comprehensive CRAM analysis...")
     
     # ========================================================================
     # Panel 1: Score Distribution with KDE and Statistics
@@ -397,14 +397,14 @@ def create_comprehensive_cram_analysis(
     
     # Calculate means per quality
     angles = np.linspace(0, 2 * np.pi, len(properties), endpoint=False).tolist()
-    angles += angles[:1]  # Complete the circle
+    angles += angles[:1] # Complete the circle
     
     for q in quality_order:
         if q not in df_norm['quality'].values:
             continue
         
         values = df_norm[df_norm['quality'] == q][properties].mean().values.tolist()
-        values += values[:1]  # Complete the circle
+        values += values[:1] # Complete the circle
         
         color = CRAM_COLORS[q.lower()]
         ax9.plot(angles, values, 'o-', linewidth=3, label=q,
@@ -504,12 +504,12 @@ def create_comprehensive_cram_analysis(
     # ========================================================================
     # Panel 12: Key Statistics Summary
     # ========================================================================
-    ax12 = fig.add_subplot(gs[3, :])
+    ax12 = fig.add_subplot(gs[3,:])
     ax12.axis('off')
     
     # Calculate comprehensive statistics
     stats_text = f"""
-    📊 COMPREHENSIVE CRAM MOLECULAR ANALYSIS SUMMARY
+     COMPREHENSIVE CRAM MOLECULAR ANALYSIS SUMMARY
     
     Dataset Statistics:
     • Total Molecules: {len(df)}
@@ -549,7 +549,7 @@ def create_comprehensive_cram_analysis(
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
     
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -585,7 +585,7 @@ def create_advanced_enzyme_analysis(
     gs = GridSpec(4, 4, figure=fig, hspace=0.4, wspace=0.4,
                   left=0.05, right=0.98, top=0.94, bottom=0.05)
     
-    print(f"📊 Generating advanced enzyme analysis...")
+    print(f" Generating advanced enzyme analysis...")
     
     # Add sequence length
     df['seq_length'] = df['sequence'].apply(len)
@@ -934,7 +934,7 @@ def create_advanced_enzyme_analysis(
     ax10.axis('off')
     
     stats_text = f"""
-    📊 ADVANCED ENZYME CLUSTERING ANALYSIS SUMMARY
+     ADVANCED ENZYME CLUSTERING ANALYSIS SUMMARY
     
     Dataset Statistics:
     • Total Enzymes: {len(df)}
@@ -948,7 +948,7 @@ def create_advanced_enzyme_analysis(
     for cluster_id in sorted(df['cluster'].unique()):
         cluster_df = df[df['cluster'] == cluster_id]
         pct = len(cluster_df) / len(df) * 100
-        stats_text += f"    • Cluster {cluster_id}: n={len(cluster_df)} ({pct:.1f}%) | pLDDT={cluster_df['plddt'].mean():.1f}±{cluster_df['plddt'].std():.1f}\n"
+        stats_text += f" • Cluster {cluster_id}: n={len(cluster_df)} ({pct:.1f}%) | pLDDT={cluster_df['plddt'].mean():.1f}±{cluster_df['plddt'].std():.1f}\n"
     
     stats_text += f"""
     Structure Quality:
@@ -973,7 +973,7 @@ def create_advanced_enzyme_analysis(
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
     
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ============================================================================
@@ -1049,17 +1049,17 @@ def generate_demo_data():
 
 if __name__ == '__main__':
     print("\n" + "="*80)
-    print("🎨 ADVANCED MULTI-PLOT VISUALIZATIONS (700 DPI)")
+    print(" ADVANCED MULTI-PLOT VISUALIZATIONS (700 DPI)")
     print("="*80)
     
     # Generate demo data
     cram_data, enzyme_data, docking_results, md_results = generate_demo_data()
     
-    print(f"\n📊 Data loaded:")
-    print(f"  - CRAM molecules: {len(cram_data)}")
-    print(f"  - Enzymes: {len(enzyme_data)}")
-    print(f"  - Docking results: {len(docking_results)}")
-    print(f"  - MD simulations: {len(md_results)}\n")
+    print(f"\n Data loaded:")
+    print(f" - CRAM molecules: {len(cram_data)}")
+    print(f" - Enzymes: {len(enzyme_data)}")
+    print(f" - Docking results: {len(docking_results)}")
+    print(f" - MD simulations: {len(md_results)}\n")
     
     # Generate advanced figures
     try:
@@ -1070,15 +1070,15 @@ if __name__ == '__main__':
         create_advanced_enzyme_analysis(enzyme_data)
         
         print("\n" + "="*80)
-        print("✅ ALL ADVANCED VISUALIZATIONS GENERATED!")
+        print(" ALL ADVANCED VISUALIZATIONS GENERATED!")
         print("="*80)
         print("\nGenerated files:")
-        print("  1. fig1_comprehensive_cram_analysis.png")
-        print("  2. fig2_advanced_enzyme_analysis.png")
+        print(" 1. fig1_comprehensive_cram_analysis.png")
+        print(" 2. fig2_advanced_enzyme_analysis.png")
         print("\nAll files optimized for A0 poster at 700 DPI")
         print("="*80 + "\n")
         
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n Error: {e}")
         import traceback
         traceback.print_exc()

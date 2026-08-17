@@ -10,7 +10,7 @@ import gradio as gr
 def create_header():
     """Create the application header."""
     gr.Markdown("""
-    # 🧪 CRAM Generator
+    # CRAM Generator
     
     **Deep Learning Toolkit for Marine DOM Molecule Generation**
     
@@ -24,6 +24,6 @@ def create_header():
 def create_compact_header():
     """Create a compact header for embedded use."""
     gr.Markdown("""
-    # 🧪 CRAM Generator
+    # CRAM Generator
     *Marine DOM Molecule Generation Toolkit*
     """)

@@ -22,11 +22,11 @@ from tqdm import tqdm
 
 # Alicyclic ring count classes for CRAM
 N_ALICYCLIC_CLASSES = {
-    'monocyclic': 1,      # 1 alicyclic ring
-    'bicyclic': 2,        # 2 fused alicyclic rings (like decalin)
-    'tricyclic': 3,       # 3 fused rings (like adamantane skeleton)
-    'tetracyclic': 4,     # 4 fused rings
-    'polycyclic': 5       # 5+ fused rings (steroid-like)
+    'monocyclic': 1, # 1 alicyclic ring
+    'bicyclic': 2, # 2 fused alicyclic rings (like decalin)
+    'tricyclic': 3, # 3 fused rings (like adamantane skeleton)
+    'tetracyclic': 4, # 4 fused rings
+    'polycyclic': 5 # 5+ fused rings (steroid-like)
 }
 
 class EnhancedPropertyConditionEncoder(nn.Module):
@@ -58,17 +58,17 @@ class EnhancedPropertyConditionEncoder(nn.Module):
         super().__init__()
         
         # Property embeddings
-        self.n_cooh_emb = nn.Embedding(7, 8)           # COOH count 0-6 → 8 dims
-        self.ring_class_emb = nn.Embedding(num_ring_classes, 16)  # Ring class → 16 dims
+        self.n_cooh_emb = nn.Embedding(7, 8) # COOH count 0-6 → 8 dims
+        self.ring_class_emb = nn.Embedding(num_ring_classes, 16) # Ring class → 16 dims
         self.ring_size_class_emb = nn.Embedding(3, 4) # Ring size class → 4 dims
         
         # NEW: Alicyclic ring count embedding (0-5+ rings → 8 dims)
         # This is critical for generating bi-/tri-/quad-alicyclic structures
-        self.n_alicyclic_emb = nn.Embedding(6, 8)     # 0-5+ alicyclic rings → 8 dims
+        self.n_alicyclic_emb = nn.Embedding(6, 8) # 0-5+ alicyclic rings → 8 dims
         
         # Continuous properties: aliphatic_pct, mw, has_benzene, dbe_c, dbe_o, dbe_h, avg_ring_size
         # Total input: 8 (n_cooh) + 16 (ring_class) + 4 (ring_size_class) + 8 (n_alicyclic) + 7 (continuous) = 43
-        input_dim = 8 + 16 + 4 + 8 + 7  # 43 total
+        input_dim = 8 + 16 + 4 + 8 + 7 # 43 total
         
         self.mlp = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
@@ -133,13 +133,13 @@ class EnhancedPropertyConditionEncoder(nn.Module):
         
         # Clamp values
         ring_size_class = ring_size_class.clamp(0, 2)
-        n_alicyclic_rings = n_alicyclic_rings.clamp(0, 5)  # Max 5 for embedding
+        n_alicyclic_rings = n_alicyclic_rings.clamp(0, 5) # Max 5 for embedding
         
         # Embeddings
-        cooh_emb = self.n_cooh_emb(n_cooh)                    # (batch, 8)
-        ring_emb = self.ring_class_emb(ring_class)            # (batch, 16)
-        ring_size_emb = self.ring_size_class_emb(ring_size_class)  # (batch, 4)
-        alicyclic_emb = self.n_alicyclic_emb(n_alicyclic_rings)    # (batch, 8) ← NEW
+        cooh_emb = self.n_cooh_emb(n_cooh) # (batch, 8)
+        ring_emb = self.ring_class_emb(ring_class) # (batch, 16)
+        ring_size_emb = self.ring_size_class_emb(ring_size_class) # (batch, 4)
+        alicyclic_emb = self.n_alicyclic_emb(n_alicyclic_rings) # (batch, 8) ← NEW
         
         # Continuous features
         continuous = torch.stack([
@@ -150,7 +150,7 @@ class EnhancedPropertyConditionEncoder(nn.Module):
             dbe_o.clamp(0, 1),
             dbe_h.clamp(0, 1),
             avg_ring_size.clamp(0, 1),
-        ], dim=-1)  # (batch, 7)
+        ], dim=-1) # (batch, 7)
         
         # Concatenate all (8 + 16 + 4 + 8 + 7 = 43)
         x = torch.cat([cooh_emb, ring_emb, ring_size_emb, alicyclic_emb, continuous], dim=-1)
@@ -207,9 +207,9 @@ class PolycyclicCRAMGenerator:
         # Or specify exact number of alicyclic rings
         polycyclic = generator.generate_polycyclic(
             n=100, 
-            n_alicyclic_rings=4,  # Tetracyclic
+            n_alicyclic_rings=4, # Tetracyclic
             n_cooh=4,
-            has_benzene=False  # Pure alicyclic
+            has_benzene=False # Pure alicyclic
         )
     """
     
@@ -217,7 +217,7 @@ class PolycyclicCRAMGenerator:
         'fused': 0, 'fused_aro_alicyclic': 0,
         'mixed': 1, 'mixed_aro_alicyclic': 1,
         'benzene_aliphatic': 2,
-        'pure_alicyclic': 3,  # ← Most relevant for pure polycyclic
+        'pure_alicyclic': 3, # ← Most relevant for pure polycyclic
         'pure_aromatic': 4,
         'acyclic': 5
     }
@@ -239,17 +239,17 @@ class PolycyclicCRAMGenerator:
     @torch.no_grad()
     def generate_polycyclic(self, 
                             n: int = 100,
-                            n_alicyclic_rings: int = 2,  # ← KEY PARAMETER
+                            n_alicyclic_rings: int = 2, # ← KEY PARAMETER
                             n_cooh: int = 3,
                             ring_class: str = 'pure_alicyclic',
-                            aliphatic_pct: float = 0.75,  # Higher for pure alicyclic
+                            aliphatic_pct: float = 0.75, # Higher for pure alicyclic
                             mw: float = 400.0,
-                            has_benzene: bool = False,    # False for pure alicyclic
+                            has_benzene: bool = False, # False for pure alicyclic
                             dbe_c: float = 0.4,
                             dbe_o: float = 1.0,
                             dbe_h: float = 0.2,
-                            avg_ring_size: float = 5.5,   # 5-6 membered rings
-                            ring_size_class: int = 1,     # CRAM-preferred
+                            avg_ring_size: float = 5.5, # 5-6 membered rings
+                            ring_size_class: int = 1, # CRAM-preferred
                             temperature: float = 1.0,
                             max_length: int = 100) -> List[str]:
         """
@@ -301,7 +301,7 @@ class PolycyclicCRAMGenerator:
             n_cooh_t, ring_t, aliphatic_t, mw_t, benzene_t,
             dbe_c_t, dbe_o_t, dbe_h_t,
             avg_ring_size_t, ring_size_class_t,
-            n_alicyclic_t  # ← Pass n_alicyclic_rings
+            n_alicyclic_t # ← Pass n_alicyclic_rings
         )
         
         # Sample from latent space
@@ -330,7 +330,7 @@ class PolycyclicCRAMGenerator:
         kwargs.setdefault('ring_class', 'pure_alicyclic')
         kwargs.setdefault('has_benzene', False)
         kwargs.setdefault('aliphatic_pct', 0.8)
-        kwargs.setdefault('mw', 450.0)  # Slightly larger for tricyclic
+        kwargs.setdefault('mw', 450.0) # Slightly larger for tricyclic
         return self.generate_polycyclic(n=n, n_alicyclic_rings=3, **kwargs)
     
     def generate_tetracyclic(self, n: int = 100, **kwargs) -> List[str]:
@@ -338,15 +338,15 @@ class PolycyclicCRAMGenerator:
         kwargs.setdefault('ring_class', 'pure_alicyclic')
         kwargs.setdefault('has_benzene', False)
         kwargs.setdefault('aliphatic_pct', 0.85)
-        kwargs.setdefault('mw', 500.0)  # Larger for tetracyclic
-        kwargs.setdefault('n_cooh', 4)  # More COOH for larger scaffold
+        kwargs.setdefault('mw', 500.0) # Larger for tetracyclic
+        kwargs.setdefault('n_cooh', 4) # More COOH for larger scaffold
         return self.generate_polycyclic(n=n, n_alicyclic_rings=4, **kwargs)
     
     def generate_mixed_polycyclic(self, n: int = 100, 
                                    n_alicyclic_rings: int = 2,
                                    **kwargs) -> List[str]:
         """Generate mixed aromatic + alicyclic fused systems."""
-        kwargs.setdefault('ring_class', 'fused')  # Fused aro-alicyclic
+        kwargs.setdefault('ring_class', 'fused') # Fused aro-alicyclic
         kwargs.setdefault('has_benzene', True)
         kwargs.setdefault('aliphatic_pct', 0.6)
         return self.generate_polycyclic(n=n, n_alicyclic_rings=n_alicyclic_rings, **kwargs)
@@ -373,11 +373,11 @@ class PolycyclicCRAMGenerator:
         if polycyclic_distribution is None:
             # Default distribution favoring CRAM-relevant polycyclic systems
             polycyclic_distribution = {
-                1: 0.10,  # 10% monocyclic
-                2: 0.35,  # 35% bicyclic (most common CRAM scaffold)
-                3: 0.30,  # 30% tricyclic
-                4: 0.20,  # 20% tetracyclic
-                5: 0.05   # 5% highly polycyclic
+                1: 0.10, # 10% monocyclic
+                2: 0.35, # 35% bicyclic (most common CRAM scaffold)
+                3: 0.30, # 30% tricyclic
+                4: 0.20, # 20% tetracyclic
+                5: 0.05 # 5% highly polycyclic
             }
         
         def polycyclic_sampler():
@@ -394,7 +394,7 @@ class PolycyclicCRAMGenerator:
                 'n_alicyclic_rings': n_alicyclic,
                 'n_cooh': random.choice([2, 3, 3, 4, 4] if n_alicyclic < 4 else [3, 4, 4, 5]),
                 'ring_class': 'pure_alicyclic' if random.random() > 0.3 else 'fused',
-                'aliphatic_pct': 0.6 + n_alicyclic * 0.05,  # Higher for more rings
+                'aliphatic_pct': 0.6 + n_alicyclic * 0.05, # Higher for more rings
                 'mw': random.gauss(base_mw, 50),
                 'has_benzene': random.random() > 0.7,
                 'dbe_c': random.uniform(0.3, 0.5),
@@ -454,12 +454,12 @@ class PolycyclicCRAMGenerator:
         
         # Print statistics
         if len(df) > 0:
-            print(f"\n✓ Generated {len(df):,} valid polycyclic CRAM molecules")
+            print(f"\n Generated {len(df):,} valid polycyclic CRAM molecules")
             print("Ring count distribution:")
             for n_rings, count in df['n_alicyclic_rings'].value_counts().sort_index().items():
                 ring_type = {1: 'Monocyclic', 2: 'Bicyclic', 3: 'Tricyclic', 
                             4: 'Tetracyclic', 5: 'Polycyclic'}.get(n_rings, f'{n_rings}-cyclic')
-                print(f"  {ring_type}: {count:,} ({100*count/len(df):.1f}%)")
+                print(f" {ring_type}: {count:,} ({100*count/len(df):.1f}%)")
         
         return df
     
@@ -578,7 +578,7 @@ def enhanced_extract_properties(mol, is_true_cram_func, ring_class_to_idx):
             'has_benzene': has_benzene,
             'avg_ring_size': avg_ring_size_norm,
             'ring_size_class': ring_size_class,
-            'n_alicyclic_rings': min(n_alicyclic_rings, 5)  # Cap at 5 for embedding
+            'n_alicyclic_rings': min(n_alicyclic_rings, 5) # Cap at 5 for embedding
         }
     except:
         return None
@@ -625,9 +625,9 @@ INTEGRATION STEPS:
    # Or customize:
    custom = generator.generate_polycyclic(
        n=1000,
-       n_alicyclic_rings=3,  # Tricyclic
+       n_alicyclic_rings=3, # Tricyclic
        n_cooh=4,
-       has_benzene=False,    # Pure alicyclic
+       has_benzene=False, # Pure alicyclic
        aliphatic_pct=0.85
    )
 
@@ -646,10 +646,10 @@ EXAMPLE STRUCTURES BY RING COUNT:
 if __name__ == '__main__':
     print("Enhanced Polycyclic CRAM Generator loaded!")
     print("\nAvailable classes:")
-    print("  - EnhancedPropertyConditionEncoder")
-    print("  - PolycyclicCRAMGenerator")
+    print(" - EnhancedPropertyConditionEncoder")
+    print(" - PolycyclicCRAMGenerator")
     print("\nKey methods:")
-    print("  generator.generate_bicyclic(n=100, n_cooh=3)")
-    print("  generator.generate_tricyclic(n=100, n_cooh=4)")
-    print("  generator.generate_tetracyclic(n=100, n_cooh=5)")
-    print("  generator.generate_polycyclic(n=100, n_alicyclic_rings=4)")
+    print(" generator.generate_bicyclic(n=100, n_cooh=3)")
+    print(" generator.generate_tricyclic(n=100, n_cooh=4)")
+    print(" generator.generate_tetracyclic(n=100, n_cooh=5)")
+    print(" generator.generate_polycyclic(n=100, n_alicyclic_rings=4)")

@@ -524,7 +524,7 @@ class PubChemCRAMSearch:
             Filtered DataFrame with TRUE CRAM molecules only
         """
         logger.info("Filtering for TRUE CRAM molecules...")
-        logger.info("  Requirements: 2+ COOH AND alicyclic ring AND >60% aliphatic")
+        logger.info(" Requirements: 2+ COOH AND alicyclic ring AND >60% aliphatic")
         
         cram_molecules = []
         filter_stats = {
@@ -535,7 +535,7 @@ class PubChemCRAMSearch:
             'low_aliphatic': 0,
             'has_aromatic': 0,
             'passed_true_cram': 0,
-            'passed_partial_cram': 0  # Has ring + COOH but may have some aromatic
+            'passed_partial_cram': 0 # Has ring + COOH but may have some aromatic
         }
         
         # Pre-compile SMARTS patterns
@@ -614,7 +614,7 @@ class PubChemCRAMSearch:
                     filter_stats['insufficient_cooh'] += 1
                     # Still collect molecules with 1 COOH + alicyclic for dataset diversity
                     if carboxyl_count >= 1 and has_alicyclic and aliphatic_pct >= 0.6:
-                        pass  # Will be added as partial CRAM
+                        pass # Will be added as partial CRAM
                     else:
                         continue
                 
@@ -666,15 +666,15 @@ class PubChemCRAMSearch:
         logger.info(f"\n{'='*70}")
         logger.info("TRUE CRAM Filter Statistics:")
         logger.info(f"{'='*70}")
-        logger.info(f"  Total processed:        {filter_stats['total']:,}")
-        logger.info(f"  Invalid/failed:         {filter_stats['invalid']:,}")
-        logger.info(f"  Rejected - <2 COOH:     {filter_stats['insufficient_cooh']:,}")
-        logger.info(f"  Rejected - no alicyclic:{filter_stats['no_alicyclic_ring']:,}")
-        logger.info(f"  Rejected - <60% aliph:  {filter_stats['low_aliphatic']:,}")
+        logger.info(f" Total processed: {filter_stats['total']:,}")
+        logger.info(f" Invalid/failed: {filter_stats['invalid']:,}")
+        logger.info(f" Rejected - <2 COOH: {filter_stats['insufficient_cooh']:,}")
+        logger.info(f" Rejected - no alicyclic:{filter_stats['no_alicyclic_ring']:,}")
+        logger.info(f" Rejected - <60% aliph: {filter_stats['low_aliphatic']:,}")
         logger.info(f"{'='*70}")
-        logger.info(f"  ✅ TRUE CRAM (all criteria): {filter_stats['passed_true_cram']:,}")
-        logger.info(f"  ⚠️  Partial CRAM (1 COOH):   {filter_stats['passed_partial_cram']:,}")
-        logger.info(f"  📊 Total passed:             {len(cram_molecules):,}")
+        logger.info(f" TRUE CRAM (all criteria): {filter_stats['passed_true_cram']:,}")
+        logger.info(f" Partial CRAM (1 COOH): {filter_stats['passed_partial_cram']:,}")
+        logger.info(f" Total passed: {len(cram_molecules):,}")
         logger.info(f"{'='*70}")
         
         return pd.DataFrame(cram_molecules)
@@ -741,8 +741,8 @@ class PubChemCRAMSearch:
                 if response.status_code == 200:
                     data = response.json()
                     cids = data.get("IdentifierList", {}).get("CID", [])
-                    all_cids.update(cids[:1000])  # Limit per class
-                    logger.info(f"  {source}: {len(cids)} compounds")
+                    all_cids.update(cids[:1000]) # Limit per class
+                    logger.info(f" {source}: {len(cids)} compounds")
                     
             except Exception as e:
                 logger.debug(f"Error with {source}: {e}")
@@ -820,12 +820,12 @@ class PubChemCRAMSearch:
                     cids = data.get("IdentifierList", {}).get("CID", [])
                     all_cids.update(cids)
                     if cids:
-                        logger.info(f"  {keyword}: {len(cids)} compounds")
+                        logger.info(f" {keyword}: {len(cids)} compounds")
                         
             except Exception as e:
                 continue
         
-        logger.info(f"  Total from natural products: {len(all_cids)}")
+        logger.info(f" Total from natural products: {len(all_cids)}")
         return list(all_cids)
     
     def search_environmental_dom_molecules(self) -> List[int]:
@@ -888,12 +888,12 @@ class PubChemCRAMSearch:
                     cids = data.get("IdentifierList", {}).get("CID", [])
                     all_cids.update(cids)
                     if cids:
-                        logger.info(f"  {keyword}: {len(cids)} compounds")
+                        logger.info(f" {keyword}: {len(cids)} compounds")
                         
             except Exception as e:
                 continue
         
-        logger.info(f"  Total from environmental sources: {len(all_cids)}")
+        logger.info(f" Total from environmental sources: {len(all_cids)}")
         return list(all_cids)
     
     def run_comprehensive_search(self, max_results_per_query: int = 5000, include_extended_sources: bool = True):
@@ -916,10 +916,10 @@ class PubChemCRAMSearch:
         queries = self.build_cram_queries()
         
         for query in queries:
-            logger.info(f"\n  Query: {query['description']}")
+            logger.info(f"\n Query: {query['description']}")
             cids = self.search_by_smarts(query['smarts'], max_results_per_query)
             all_cids.update(cids)
-            logger.info(f"  Total unique CIDs so far: {len(all_cids)}")
+            logger.info(f" Total unique CIDs so far: {len(all_cids)}")
         
         # 2. Search by keywords
         logger.info("\n[2/5] Searching by chemical name keywords...")
@@ -947,7 +947,7 @@ class PubChemCRAMSearch:
             logger.info(f"Total unique CIDs: {len(all_cids)}")
         
         # Fetch properties
-        logger.info(f"\n📥 Fetching compound properties for {len(all_cids)} CIDs...")
+        logger.info(f"\n Fetching compound properties for {len(all_cids)} CIDs...")
         cid_list = list(all_cids)
         df = self.get_compound_properties(cid_list)
         
@@ -963,7 +963,7 @@ class PubChemCRAMSearch:
         logger.info(f"Raw data saved to {raw_file}")
         
         # Filter for TRUE CRAM molecules
-        logger.info("\n🔬 Filtering for TRUE CRAM molecules...")
+        logger.info("\n Filtering for TRUE CRAM molecules...")
         cram_df = self.filter_cram_molecules(df)
         
         if len(cram_df) == 0:
@@ -973,14 +973,14 @@ class PubChemCRAMSearch:
         # Save results
         output_file = self.output_dir / "cram_molecules.csv"
         cram_df.to_csv(output_file, index=False)
-        logger.info(f"\n✅ Saved {len(cram_df)} CRAM molecules to {output_file}")
+        logger.info(f"\n Saved {len(cram_df)} CRAM molecules to {output_file}")
         
         # Save TRUE CRAM only (2+ COOH)
         if 'is_true_cram' in cram_df.columns:
             true_cram_df = cram_df[cram_df['is_true_cram'] == True]
             true_cram_file = self.output_dir / "true_cram_molecules.csv"
             true_cram_df.to_csv(true_cram_file, index=False)
-            logger.info(f"✅ Saved {len(true_cram_df)} TRUE CRAM molecules to {true_cram_file}")
+            logger.info(f" Saved {len(true_cram_df)} TRUE CRAM molecules to {true_cram_file}")
         
         # Generate summary
         self._generate_summary(cram_df)
@@ -998,44 +998,44 @@ class PubChemCRAMSearch:
         # TRUE CRAM count
         if 'is_true_cram' in df.columns:
             true_cram_count = df['is_true_cram'].sum()
-            logger.info(f"\n🎯 TRUE CRAM (2+ COOH + alicyclic + >60% aliphatic): {true_cram_count} ({100*true_cram_count/len(df):.1f}%)")
+            logger.info(f"\n TRUE CRAM (2+ COOH + alicyclic + >60% aliphatic): {true_cram_count} ({100*true_cram_count/len(df):.1f}%)")
         
         if 'carboxyl_count' in df.columns:
-            logger.info(f"\n📊 Carboxyl group distribution:")
-            logger.info(f"  Mean: {df['carboxyl_count'].mean():.2f}")
-            logger.info(f"  Min: {df['carboxyl_count'].min()}")
-            logger.info(f"  Max: {df['carboxyl_count'].max()}")
-            logger.info(f"  2+ COOH: {(df['carboxyl_count'] >= 2).sum()} ({100*(df['carboxyl_count'] >= 2).mean():.1f}%)")
+            logger.info(f"\n Carboxyl group distribution:")
+            logger.info(f" Mean: {df['carboxyl_count'].mean():.2f}")
+            logger.info(f" Min: {df['carboxyl_count'].min()}")
+            logger.info(f" Max: {df['carboxyl_count'].max()}")
+            logger.info(f" 2+ COOH: {(df['carboxyl_count'] >= 2).sum()} ({100*(df['carboxyl_count'] >= 2).mean():.1f}%)")
             
         if 'has_alicyclic' in df.columns:
             alicyclic_count = df['has_alicyclic'].sum()
-            logger.info(f"\n🔵 Alicyclic rings: {alicyclic_count} ({100*alicyclic_count/len(df):.1f}%)")
+            logger.info(f"\n Alicyclic rings: {alicyclic_count} ({100*alicyclic_count/len(df):.1f}%)")
             
         if 'aliphatic_pct' in df.columns:
-            logger.info(f"\n🟢 Aliphatic character:")
-            logger.info(f"  Mean: {df['aliphatic_pct'].mean():.1%}")
-            logger.info(f"  Min: {df['aliphatic_pct'].min():.1%}")
-            logger.info(f"  Max: {df['aliphatic_pct'].max():.1%}")
-            logger.info(f"  >60% aliphatic: {(df['aliphatic_pct'] >= 0.6).sum()} ({100*(df['aliphatic_pct'] >= 0.6).mean():.1f}%)")
+            logger.info(f"\n Aliphatic character:")
+            logger.info(f" Mean: {df['aliphatic_pct'].mean():.1%}")
+            logger.info(f" Min: {df['aliphatic_pct'].min():.1%}")
+            logger.info(f" Max: {df['aliphatic_pct'].max():.1%}")
+            logger.info(f" >60% aliphatic: {(df['aliphatic_pct'] >= 0.6).sum()} ({100*(df['aliphatic_pct'] >= 0.6).mean():.1f}%)")
         
         if 'O_C_ratio' in df.columns and 'H_C_ratio' in df.columns:
-            logger.info(f"\n⚗️ Elemental ratios (Van Krevelen):")
-            logger.info(f"  O/C: {df['O_C_ratio'].mean():.3f} (range {df['O_C_ratio'].min():.3f}-{df['O_C_ratio'].max():.3f})")
-            logger.info(f"  H/C: {df['H_C_ratio'].mean():.3f} (range {df['H_C_ratio'].min():.3f}-{df['H_C_ratio'].max():.3f})")
+            logger.info(f"\n Elemental ratios (Van Krevelen):")
+            logger.info(f" O/C: {df['O_C_ratio'].mean():.3f} (range {df['O_C_ratio'].min():.3f}-{df['O_C_ratio'].max():.3f})")
+            logger.info(f" H/C: {df['H_C_ratio'].mean():.3f} (range {df['H_C_ratio'].min():.3f}-{df['H_C_ratio'].max():.3f})")
         
         if 'MolecularWeight' in df.columns:
-            logger.info(f"\n⚖️ Molecular weight:")
+            logger.info(f"\n Molecular weight:")
             try:
                 mw = pd.to_numeric(df['MolecularWeight'], errors='coerce')
-                logger.info(f"  Mean: {mw.mean():.1f}")
-                logger.info(f"  Range: {mw.min():.1f} - {mw.max():.1f}")
+                logger.info(f" Mean: {mw.mean():.1f}")
+                logger.info(f" Range: {mw.min():.1f} - {mw.max():.1f}")
             except Exception as e:
-                logger.warning(f"  Could not calculate: {e}")
+                logger.warning(f" Could not calculate: {e}")
         
         if 'ring_count' in df.columns:
-            logger.info(f"\n💍 Ring statistics:")
-            logger.info(f"  Mean rings: {df['ring_count'].mean():.2f}")
-            logger.info(f"  Max rings: {df['ring_count'].max()}")
+            logger.info(f"\n Ring statistics:")
+            logger.info(f" Mean rings: {df['ring_count'].mean():.2f}")
+            logger.info(f" Max rings: {df['ring_count'].max()}")
         
         # Save summary to file
         summary_file = self.output_dir / "cram_summary.txt"
@@ -1047,9 +1047,9 @@ class PubChemCRAMSearch:
             if 'is_true_cram' in df.columns:
                 f.write(f"TRUE CRAM (all criteria): {df['is_true_cram'].sum()} ({100*df['is_true_cram'].mean():.1f}%)\n\n")
             f.write("TRUE CRAM Requirements:\n")
-            f.write("  ✓ 2+ carboxyl groups (COOH or COO-)\n")
-            f.write("  ✓ Alicyclic ring (non-aromatic cyclic structure)\n")
-            f.write("  ✓ >60% aliphatic carbons\n\n")
+            f.write(" 2+ carboxyl groups (COOH or COO-)\n")
+            f.write(" Alicyclic ring (non-aromatic cyclic structure)\n")
+            f.write(" >60% aliphatic carbons\n\n")
             if 'carboxyl_count' in df.columns:
                 f.write(f"COOH groups: {df['carboxyl_count'].mean():.2f} average\n")
             if 'has_alicyclic' in df.columns:
@@ -1060,33 +1060,33 @@ class PubChemCRAMSearch:
                 f.write(f"O/C ratio: {df['O_C_ratio'].mean():.3f} average\n")
                 f.write(f"H/C ratio: {df['H_C_ratio'].mean():.3f} average\n")
         
-        logger.info(f"\n📄 Summary saved to {summary_file}")
+        logger.info(f"\n Summary saved to {summary_file}")
 
 
 def main():
     """Main execution function"""
     print("""
     ╔════════════════════════════════════════════════════════════════════╗
-    ║   PubChem TRUE CRAM Molecule Search                                ║
-    ║   Carboxyl-Rich Alicyclic Molecules                                ║
+    ║ PubChem TRUE CRAM Molecule Search ║
+    ║ Carboxyl-Rich Alicyclic Molecules ║
     ╠════════════════════════════════════════════════════════════════════╣
-    ║   TRUE CRAM Requirements:                                          ║
-    ║   ✓ 2+ carboxyl groups (COOH or COO-)                             ║
-    ║   ✓ Alicyclic ring (non-aromatic cyclic structure)                ║
-    ║   ✓ >60% aliphatic carbons (non-aromatic)                         ║
+    ║ TRUE CRAM Requirements: ║
+    ║ 2+ carboxyl groups (COOH or COO-) ║
+    ║ Alicyclic ring (non-aromatic cyclic structure) ║
+    ║ >60% aliphatic carbons (non-aromatic) ║
     ╚════════════════════════════════════════════════════════════════════╝
     """)
     
     # Initialize searcher
     searcher = PubChemCRAMSearch(
         output_dir="./cram_data",
-        delay=0.2  # Respect PubChem rate limits
+        delay=0.2 # Respect PubChem rate limits
     )
     
     # Run comprehensive search with extended sources
     cram_df = searcher.run_comprehensive_search(
         max_results_per_query=5000,
-        include_extended_sources=True  # Include ChEMBL, natural products, environmental
+        include_extended_sources=True # Include ChEMBL, natural products, environmental
     )
     
     print("\n" + "=" * 70)
@@ -1094,12 +1094,12 @@ def main():
     print("=" * 70)
     print(f"\nResults saved to: {searcher.output_dir}")
     print("\nFiles generated:")
-    print("  - cram_molecules.csv:      All CRAM-like molecules (1+ COOH + alicyclic)")
-    print("  - true_cram_molecules.csv: TRUE CRAM only (2+ COOH + alicyclic + >60% aliphatic)")
-    print("  - raw_compounds.csv:       All downloaded compounds (for debugging)")
-    print("  - cram_summary.txt:        Summary statistics")
+    print(" - cram_molecules.csv: All CRAM-like molecules (1+ COOH + alicyclic)")
+    print(" - true_cram_molecules.csv: TRUE CRAM only (2+ COOH + alicyclic + >60% aliphatic)")
+    print(" - raw_compounds.csv: All downloaded compounds (for debugging)")
+    print(" - cram_summary.txt: Summary statistics")
     print("\nYou can now use this dataset for training your model!")
-    print("\n💡 Tip: Use true_cram_molecules.csv for stricter CRAM definition")
+    print("\n Tip: Use true_cram_molecules.csv for stricter CRAM definition")
 
 
 if __name__ == "__main__":

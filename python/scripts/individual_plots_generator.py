@@ -98,7 +98,7 @@ def plot_cram_score_distribution(cram_data, save_path='01_cram_score_distributio
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -136,7 +136,7 @@ def plot_carboxyl_distribution(cram_data, save_path='02_carboxyl_distribution.pn
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -177,7 +177,7 @@ def plot_aliphatic_distribution(cram_data, save_path='03_aliphatic_distribution.
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -215,7 +215,7 @@ def plot_mw_logp_space(cram_data, save_path='04_mw_logp_space.png', dpi=700):
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -250,7 +250,7 @@ def plot_enzyme_clusters_pie(enzyme_data, save_path='05_enzyme_clusters_pie.png'
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -296,7 +296,7 @@ def plot_plddt_distribution(enzyme_data, save_path='06_plddt_distribution.png', 
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -337,7 +337,7 @@ def plot_binding_affinity_histogram(docking_results, save_path='07_binding_affin
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -384,7 +384,7 @@ def plot_top20_binding_affinities(docking_results, save_path='08_top20_binding_a
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -430,7 +430,7 @@ def plot_binding_affinity_by_cluster(docking_results, save_path='09_binding_affi
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -473,7 +473,7 @@ def plot_docking_score_vs_affinity(docking_results, save_path='10_docking_score_
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -506,7 +506,7 @@ def plot_md_rmsd_trajectories(md_results, save_path='11_md_rmsd_trajectories.png
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -536,7 +536,7 @@ def plot_md_potential_energy(md_results, save_path='12_md_potential_energy.png',
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -566,7 +566,7 @@ def plot_md_hydrogen_bonds(md_results, save_path='13_md_hydrogen_bonds.png', dpi
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -599,7 +599,7 @@ def plot_md_temperature(md_results, save_path='14_md_temperature.png', dpi=700):
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -662,7 +662,7 @@ def plot_pipeline_success_metrics(cram_data, enzyme_data, docking_results, md_re
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✅ Saved: {save_path}")
+    print(f" Saved: {save_path}")
 
 
 # ===========================================================================
@@ -751,17 +751,17 @@ def generate_demo_data():
 
 if __name__ == '__main__':
     print("\n" + "="*80)
-    print("🎨 CRAM GENERATOR: INDIVIDUAL PLOTS (700 DPI for A0 Poster)")
+    print(" CRAM GENERATOR: INDIVIDUAL PLOTS (700 DPI for A0 Poster)")
     print("="*80)
     
     # Generate demo data
     cram_data, enzyme_data, docking_results, md_results = generate_demo_data()
     
-    print(f"\n📊 Data loaded:")
-    print(f"  - CRAM molecules: {len(cram_data)}")
-    print(f"  - Enzymes: {len(enzyme_data)}")
-    print(f"  - Docking results: {len(docking_results)}")
-    print(f"  - MD simulations: {len(md_results)}\n")
+    print(f"\n Data loaded:")
+    print(f" - CRAM molecules: {len(cram_data)}")
+    print(f" - Enzymes: {len(enzyme_data)}")
+    print(f" - Docking results: {len(docking_results)}")
+    print(f" - MD simulations: {len(md_results)}\n")
     
     print("Generating individual plots...\n")
     
@@ -783,7 +783,7 @@ if __name__ == '__main__':
     plot_pipeline_success_metrics(cram_data, enzyme_data, docking_results, md_results)
     
     print("\n" + "="*80)
-    print("✅ ALL INDIVIDUAL PLOTS GENERATED!")
+    print(" ALL INDIVIDUAL PLOTS GENERATED!")
     print("="*80)
     print("\n15 individual high-resolution figures created (700 DPI)")
     print("Ready for A0 poster presentation")

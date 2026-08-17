@@ -1,301 +1,360 @@
-"""
-Deep CRAM Feature Extractor
-===========================
-Combined 163D feature extraction.
-"""
-
+"""Notebook DeepCRAMFeatureExtractor — 163D per atom, same layout as the Colab notebook."""
+from __future__ import annotations
+from typing import Dict, Optional, Tuple
 import numpy as np
 import torch
 from rdkit import Chem
+from rdkit.Chem import Descriptors
 
-from .atom_features import AtomFeatureExtractor
-from .marine_features import MarineDOMFeatures
-from .synthetic_features import SyntheticAccessibilityFeatures
+try:
+    import dgl
+except ImportError:
+    dgl = None
 
+from .enhanced_nodes import (
+    get_base_node_features_45D,
+    get_synthetic_features_28D,
+    get_marine_features_15D,
+    get_cram_ring_chain_features_20D,
+)
+from .oxidation import EnhancedOxidationFeatures
+from .terpenoid import TerpenoidAncestryDetector
+from .functional_groups import FunctionalGroupDetector
+from .stereochemistry import get_stereochemistry_features_12D, get_conformational_stability_score
+from ..models.ring_chain import SubstructureDetector
+
+"""
+=============================================================================
+COMPLETE ENHANCED FEATURE INTEGRATION (163D + MOLECULAR FEATURES)
+=============================================================================
+
+This module combines ALL deep improvements into one cohesive feature pipeline.
+
+Feature architecture (per atom):
+├── Base chemical features (45D)
+│   └── Element, hybridization, bonds, charge, aromatic, ring info
+├── Synthetic accessibility (28D)
+│   └── Complexity, accessibility contributions
+├── Marine DOM features (15D)
+│   └── H/C, O/C ratios, DBE, marine-specific patterns
+├── CRAM ring-chain features (20D)
+│   └── Alicyclic rings, junctions, carboxyl proximity, chain character
+├── Stereochemistry features (12D)
+│   └── Chirality, ring conformation, strain, geometry
+├── Terpenoid ancestry (10D)
+│   └── Isoprene patterns, terpene signatures, oxidation level
+├── Functional group membership (13D)
+│   └── Which functional groups contain this atom
+├── Enhanced oxidation features (20D)
+│   └── Oxidation state, COOH proximity (α/β/γ/δ), hydroxyl/carbonyl types
+└── TOTAL: 163D per atom + molecular-level features
+
+Molecular-level features (used for property conditioning):
+├── Terpenoid molecular features (5D)
+├── Photostability features (6D)
+├── Conformational stability (1D)
+└── CRAM classification features (5D)
+"""
 
 class DeepCRAMFeatureExtractor:
     """
-    Complete 163D feature extraction for CRAM molecules.
+    Complete feature extraction for deep CRAM understanding.
     
-    Feature Breakdown:
-    - Base features: 45D (positions 0-44)
-    - Ring-Chain features: 20D (positions 45-64)
-    - Stereochemistry: 12D (positions 65-76)
-    - Marine: 15D (positions 77-91)
-    - Synthetic: 28D (positions 92-119)
-    - Terpenoid: 10D (positions 120-129)
-    - Functional groups: 13D (positions 130-142)
-    - Oxidation: 20D (positions 143-162)
-    Total: 163D per atom
+    This class unifies all feature extraction modules into a single
+    pipeline that produces publication-quality molecular representations.
     """
     
-    def __init__(self, feature_dim: int = 163):
-        self.feature_dim = feature_dim
-        
-        self.atom_extractor = AtomFeatureExtractor()
-        self.marine_extractor = MarineDOMFeatures()
-        self.synthetic_extractor = SyntheticAccessibilityFeatures()
+    # Feature dimensions
+    FEATURE_DIMS = {
+        'base': 45,
+        'synthetic': 28,
+        'marine': 15,
+        'ring_chain': 20,
+        'stereochemistry': 12,
+        'terpenoid': 10,
+        'functional_group': 13,
+        'enhanced_oxidation': 20,  # Added enhanced oxidation features
+    }
+    TOTAL_ATOM_DIM = sum(FEATURE_DIMS.values())  # 163D
     
-    def extract_features(self, mol) -> torch.Tensor:
+    def __init__(self, verbose: bool = False):
+        self.terpenoid_detector = TerpenoidAncestryDetector()
+        self.fg_detector = FunctionalGroupDetector()
+        try:
+            self.oxidation_extractor = EnhancedOxidationFeatures()
+        except Exception:
+            self.oxidation_extractor = None
+        if verbose:
+            print(f"DeepCRAMFeatureExtractor {self.TOTAL_ATOM_DIM}D")
+    
+    def extract_all_features(self, mol: Chem.Mol) -> Dict[str, np.ndarray]:
         """
-        Extract 163D features for all atoms.
+        Extract complete feature set for a molecule.
         
-        Args:
-            mol: RDKit molecule or SMILES string
-            
         Returns:
-            Tensor of shape (num_atoms, 163)
+            Dictionary containing:
+            - 'atom_features': (num_atoms, 163) per-atom features
+            - 'mol_features': (17,) molecular-level features
+            - 'group_membership': (num_atoms, 13) functional group masks
+            - 'substructure_masks': Dict of boolean masks
         """
-        if isinstance(mol, str):
-            mol = Chem.MolFromSmiles(mol)
-        
-        if mol is None:
-            return None
-        
         num_atoms = mol.GetNumAtoms()
-        if num_atoms == 0:
-            return None
         
-        # Extract component features
-        atom_feats = self.atom_extractor.get_features(mol)  # 45D
-        marine_feats = self.marine_extractor.get_features(mol)  # 15D
-        synthetic_feats = self.synthetic_extractor.get_features(mol)  # 28D
+        # Initialize feature arrays
+        features = {
+            'atom_features': np.zeros((num_atoms, self.TOTAL_ATOM_DIM), dtype=np.float32),
+            'mol_features': np.zeros(17, dtype=np.float32),
+            'group_membership': np.zeros((num_atoms, 13), dtype=np.float32),
+            'substructure_masks': {}
+        }
         
-        # Additional features to reach 163D
-        ring_chain = self._extract_ring_chain(mol)  # 20D
-        stereo = self._extract_stereo(mol)  # 12D
-        terpenoid = self._extract_terpenoid(mol)  # 10D
-        functional = self._extract_functional(mol)  # 13D
-        oxidation = self._extract_oxidation(mol)  # 20D
+        # Track current position in feature vector
+        idx = 0
         
-        # Concatenate all features
-        features = np.concatenate([
-            atom_feats,      # 45D
-            ring_chain,      # 20D
-            stereo,          # 12D
-            marine_feats,    # 15D
-            synthetic_feats, # 28D
-            terpenoid,       # 10D
-            functional,      # 13D
-            oxidation        # 20D
-        ], axis=1)
+        # === 1. Base chemical features (45D) ===
+        try:
+            base_features = np.asarray(get_base_node_features_45D(mol), dtype=np.float32)
+            features['atom_features'][:, idx:idx+45] = base_features
+        except Exception as e:
+            print(f"Warning: Base features failed: {e}")
+        idx += 45
         
-        # Ensure 163D
-        if features.shape[1] < self.feature_dim:
-            padding = np.zeros((features.shape[0], self.feature_dim - features.shape[1]))
-            features = np.concatenate([features, padding], axis=1)
-        elif features.shape[1] > self.feature_dim:
-            features = features[:, :self.feature_dim]
+        # === 2. Synthetic accessibility (28D) ===
+        try:
+            sa_features = np.array(
+                [get_synthetic_features_28D(mol, i) for i in range(num_atoms)],
+                dtype=np.float32,
+            )
+            features['atom_features'][:, idx:idx+28] = sa_features
+        except Exception as e:
+            print(f"Warning: Synthetic features failed: {e}")
+        idx += 28
         
-        return torch.tensor(features, dtype=torch.float32)
+        # === 3. Marine DOM features (15D) ===
+        try:
+            marine_features = np.array(
+                [get_marine_features_15D(mol, i) for i in range(num_atoms)],
+                dtype=np.float32,
+            )
+            features['atom_features'][:, idx:idx+15] = marine_features
+        except Exception as e:
+            print(f"Warning: Marine features failed: {e}")
+        idx += 15
+        
+        # === 4. CRAM ring-chain features (20D) ===
+        try:
+            ring_chain = np.array(
+                [get_cram_ring_chain_features_20D(mol, i) for i in range(num_atoms)],
+                dtype=np.float32,
+            )
+            features['atom_features'][:, idx:idx+20] = ring_chain
+        except Exception as e:
+            print(f"Warning: Ring-chain features failed: {e}")
+        idx += 20
+        
+        # === 5. Stereochemistry features (12D) ===
+        try:
+            features['atom_features'][:, idx:idx+12] = get_stereochemistry_features_12D(mol)
+        except Exception as e:
+            print(f"Warning: Stereochemistry features failed: {e}")
+        idx += 12
+        
+        # === 6. Terpenoid ancestry (10D per atom) ===
+        try:
+            mol_terp, atom_terp = self.terpenoid_detector.get_terpenoid_features_10D(mol)
+            features['atom_features'][:, idx:idx+10] = atom_terp
+            features['mol_features'][0:5] = mol_terp[:5]  # Molecular terpenoid features
+        except Exception as e:
+            print(f"Warning: Terpenoid features failed: {e}")
+        idx += 10
+        
+        # === 7. Functional group membership (13D) ===
+        try:
+            fg_membership = self.fg_detector.get_group_membership(mol)
+            features['atom_features'][:, idx:idx+13] = fg_membership
+            features['group_membership'] = fg_membership
+        except Exception as e:
+            print(f"Warning: Functional group features failed: {e}")
+        idx += 13
+        
+        # === 8. Enhanced oxidation features (20D) ===
+        try:
+            if self.oxidation_extractor is not None:
+                oxidation_features = self.oxidation_extractor.get_molecule_features(mol)
+                features['atom_features'][:, idx:idx+20] = oxidation_features
+            else:
+                # Fill with zeros if oxidation extractor not available
+                features['atom_features'][:, idx:idx+20] = 0.0
+        except Exception as e:
+            print(f"Warning: Enhanced oxidation features failed: {e}")
+            # Still fill with zeros to maintain dimension
+            features['atom_features'][:, idx:idx+20] = 0.0
+        idx += 20
+        
+        # === Molecular-level features ===
+        try:
+            # Basic molecular descriptors
+            features['mol_features'][0] = Descriptors.MolWt(mol) / 500.0  # Normalized MW
+            features['mol_features'][1] = Descriptors.MolLogP(mol) / 10.0  # Normalized LogP
+            features['mol_features'][2] = Descriptors.TPSA(mol) / 200.0  # Normalized TPSA
+            features['mol_features'][3] = mol.GetNumHeavyAtoms() / 50.0  # Normalized atom count
+            features['mol_features'][4] = Descriptors.NumRotatableBonds(mol) / 20.0
+            
+            # Additional molecular features (fill with basic descriptors)
+            features['mol_features'][5] = Descriptors.NumHDonors(mol) / 10.0
+            features['mol_features'][6] = Descriptors.NumHAcceptors(mol) / 10.0
+            features['mol_features'][7] = Descriptors.NumAromaticRings(mol) / 5.0
+            features['mol_features'][8] = Descriptors.NumAliphaticRings(mol) / 5.0
+            
+            # Calculate fraction of carbons manually (FractionCarbons doesn't exist in RDKit)
+            num_carbons = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() == 6)
+            features['mol_features'][9] = num_carbons / max(mol.GetNumAtoms(), 1)
+            
+            # Calculate fraction of oxygens manually
+            num_oxygens = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() == 8)
+            features['mol_features'][10] = num_oxygens / max(mol.GetNumAtoms(), 1)
+            features['mol_features'][11] = float(get_conformational_stability_score(mol))
+        except Exception as e:
+            print(f"Warning: Molecular features failed: {e}")
+        
+        # === Substructure masks ===
+        # Always initialize with empty masks to avoid None issues
+        for name in ['alicyclic_ring', 'chain', 'junction', 'carboxyl']:
+            features['substructure_masks'][name] = np.zeros(num_atoms, dtype=bool)
+        
+        try:
+            substructures = SubstructureDetector.detect_substructures(mol)
+            for name in ['alicyclic_ring', 'chain', 'junction', 'carboxyl']:
+                if name in substructures and substructures[name]:
+                    indices = substructures[name]
+                    mask = np.zeros(num_atoms, dtype=bool)
+                    mask[list(indices)] = True
+                    features['substructure_masks'][name] = mask
+        except Exception as e:
+            print(f"Warning: Substructure masks failed: {e}")
+            # Masks already initialized to empty above
+        
+        return features
+    
+    def extract_for_training(self, mol: Chem.Mol) -> Tuple[torch.Tensor, torch.Tensor, Dict]:
+        """
+        Extract features in format ready for training.
+        
+        Returns:
+            atom_features: (num_atoms, 143) tensor
+            mol_features: (17,) tensor
+            metadata: Dictionary with masks and labels
+        """
+        features = self.extract_all_features(mol)
+        
+        atom_features = torch.tensor(features['atom_features'], dtype=torch.float32)
+        mol_features = torch.tensor(features['mol_features'], dtype=torch.float32)
+        
+        metadata = {
+            'group_membership': torch.tensor(features['group_membership'], dtype=torch.float32),
+            'substructure_masks': {
+                k: torch.tensor(v, dtype=torch.bool) 
+                for k, v in features['substructure_masks'].items()
+            }
+        }
+        
+        return atom_features, mol_features, metadata
+
+
 
     def extract(self, mol):
-        """
-        Compatibility wrapper used by dataset builders.
-
-        Returns a dict with atom-level 163D features, or None if invalid.
-        """
-        atom_features = self.extract_features(mol)
-        if atom_features is None:
-            return None
-        if torch.is_tensor(atom_features):
-            atom_np = atom_features.detach().cpu().numpy()
-        else:
-            atom_np = np.asarray(atom_features)
-        n_atoms = atom_np.shape[0]
-        return {
-            "atom_features": atom_np,
-            "group_membership": np.zeros((n_atoms, 1), dtype=np.float32),
-            "mol_features": np.zeros(17, dtype=np.float32),
-        }
-
-    def extract_all_features(self, mol):
-        """Alias used by the CLI feature command."""
-        return self.extract(mol)
-    
-    def _extract_ring_chain(self, mol) -> np.ndarray:
-        """Extract ring-chain features (20D)."""
-        num_atoms = mol.GetNumAtoms()
-        features = np.zeros((num_atoms, 20), dtype=np.float32)
-        
-        ring_info = mol.GetRingInfo()
-        
-        for i, atom in enumerate(mol.GetAtoms()):
-            # Ring sizes 3-8 (6D)
-            for size in range(3, 9):
-                if atom.IsInRingSize(size):
-                    features[i, size - 3] = 1.0
-            
-            # Number of rings containing this atom (normalized)
-            rings_count = sum(1 for r in ring_info.AtomRings() if i in r)
-            features[i, 6] = min(rings_count / 3.0, 1.0)
-            
-            # Is bridgehead
-            features[i, 7] = 1.0 if rings_count > 1 else 0.0
-            
-            # Chain length features
-            if not atom.IsInRing():
-                chain_length = self._get_chain_length(mol, i)
-                features[i, 8] = min(chain_length / 10.0, 1.0)
-            
-            # Additional ring features
-            features[i, 9] = 1.0 if atom.IsInRing() and not atom.GetIsAromatic() else 0.0
-            features[i, 10] = 1.0 if atom.GetIsAromatic() else 0.0
-        
-        return features
-    
-    def _extract_stereo(self, mol) -> np.ndarray:
-        """Extract stereochemistry features (12D)."""
-        num_atoms = mol.GetNumAtoms()
-        features = np.zeros((num_atoms, 12), dtype=np.float32)
-        
-        for i, atom in enumerate(mol.GetAtoms()):
-            chiral = atom.GetChiralTag()
-            features[i, 0] = 1.0 if chiral == Chem.ChiralType.CHI_TETRAHEDRAL_CW else 0.0
-            features[i, 1] = 1.0 if chiral == Chem.ChiralType.CHI_TETRAHEDRAL_CCW else 0.0
-            features[i, 2] = 1.0 if chiral != Chem.ChiralType.CHI_UNSPECIFIED else 0.0
-            
-            # Degree of chirality (number of different neighbors)
-            neighbor_types = set(n.GetAtomicNum() for n in atom.GetNeighbors())
-            features[i, 3] = len(neighbor_types) / 4.0
-        
-        return features
-    
-    def _extract_terpenoid(self, mol) -> np.ndarray:
-        """Extract terpenoid features (10D)."""
-        num_atoms = mol.GetNumAtoms()
-        features = np.zeros((num_atoms, 10), dtype=np.float32)
-        
-        # Terpenoid patterns
-        patterns = {
-            'isoprene': 'CC(=C)C',
-            'cyclohexane': 'C1CCCCC1',
-            'cyclopentane': 'C1CCCC1',
-            'methyl_branch': 'CC(C)',
-        }
-        
-        for idx, (name, smarts) in enumerate(patterns.items()):
-            if idx >= 10:
-                break
-            try:
-                pat = Chem.MolFromSmarts(smarts)
-                if pat:
-                    matches = mol.GetSubstructMatches(pat)
-                    for match in matches:
-                        for atom_idx in match:
-                            if atom_idx < num_atoms:
-                                features[atom_idx, idx] = 1.0
-            except:
-                pass
-        
-        return features
-    
-    def _extract_functional(self, mol) -> np.ndarray:
-        """Extract functional group features (13D)."""
-        num_atoms = mol.GetNumAtoms()
-        features = np.zeros((num_atoms, 13), dtype=np.float32)
-        
-        patterns = {
-            'cooh': '[CX3](=O)[OX2H1]',
-            'coo_minus': '[CX3](=O)[O-]',
-            'oh': '[OX2H]',
-            'nh2': '[NX3H2]',
-            'nh': '[NX3H1]',
-            'carbonyl': '[CX3]=O',
-            'ester': '[CX3](=O)[OX2][C]',
-            'amide': '[CX3](=O)[NX3]',
-            'sulfone': '[SX4](=O)(=O)',
-            'phosphate': '[PX4](=O)',
-        }
-        
-        for idx, (name, smarts) in enumerate(patterns.items()):
-            if idx >= 13:
-                break
-            try:
-                pat = Chem.MolFromSmarts(smarts)
-                if pat:
-                    matches = mol.GetSubstructMatches(pat)
-                    for match in matches:
-                        for atom_idx in match:
-                            if atom_idx < num_atoms:
-                                features[atom_idx, idx] = 1.0
-            except:
-                pass
-        
-        return features
-    
-    def _extract_oxidation(self, mol) -> np.ndarray:
-        """Extract oxidation state features (20D)."""
-        num_atoms = mol.GetNumAtoms()
-        features = np.zeros((num_atoms, 20), dtype=np.float32)
-        
-        for i, atom in enumerate(mol.GetAtoms()):
-            # Oxidation proxies
-            if atom.GetSymbol() == 'C':
-                o_neighbors = sum(1 for n in atom.GetNeighbors() if n.GetSymbol() == 'O')
-                features[i, 0] = min(o_neighbors / 3.0, 1.0)
-                
-                # Double bonded to O
-                for bond in atom.GetBonds():
-                    if bond.GetBondType() == Chem.BondType.DOUBLE:
-                        other = bond.GetOtherAtom(atom)
-                        if other.GetSymbol() == 'O':
-                            features[i, 1] = 1.0
-            
-            if atom.GetSymbol() == 'O':
-                features[i, 2] = 1.0
-                
-            if atom.GetSymbol() == 'N':
-                features[i, 3] = 1.0
-                
-            if atom.GetSymbol() == 'S':
-                features[i, 4] = 1.0
-        
-        return features
-    
-    def _get_chain_length(self, mol, atom_idx: int, visited: set = None) -> int:
-        """Get length of chain from atom."""
-        if visited is None:
-            visited = set()
-        
-        if atom_idx in visited:
-            return 0
-        
-        atom = mol.GetAtomWithIdx(atom_idx)
-        if atom.IsInRing():
-            return 0
-        
-        visited.add(atom_idx)
-        
-        max_length = 0
-        for neighbor in atom.GetNeighbors():
-            n_idx = neighbor.GetIdx()
-            if n_idx not in visited and not neighbor.IsInRing():
-                length = self._get_chain_length(mol, n_idx, visited)
-                max_length = max(max_length, length)
-        
-        return max_length + 1
-    
-    def get_adjacency(self, mol) -> torch.Tensor:
-        """Get edge index for graph."""
+        """Dataset/CLI wrapper: dict with atom_features, mol_features, group_membership."""
         if isinstance(mol, str):
             mol = Chem.MolFromSmiles(mol)
-        
         if mol is None:
             return None
-        
-        edges = []
-        for bond in mol.GetBonds():
-            i = bond.GetBeginAtomIdx()
-            j = bond.GetEndAtomIdx()
-            edges.append([i, j])
-            edges.append([j, i])
-        
-        if len(edges) == 0:
-            return torch.zeros((2, 0), dtype=torch.long)
-        
-        return torch.tensor(edges, dtype=torch.long).t().contiguous()
+        feats = self.extract_all_features(mol)
+        return feats
+
+    def extract_features(self, mol):
+        out = self.extract(mol)
+        if out is None:
+            return None
+        return torch.as_tensor(out["atom_features"], dtype=torch.float32)
 
 
-# Singleton instance
-deep_cram_extractor = DeepCRAMFeatureExtractor()
+
+def smiles_to_graph_deep_cram(smiles: str, 
+                               feature_extractor: DeepCRAMFeatureExtractor = None
+                               ) -> Optional[dgl.DGLGraph]:
+    """
+    Convert SMILES to DGL graph with complete deep CRAM features.
+    
+    This is the production-ready graph conversion function that:
+    1. Extracts all 143D atom features
+    2. Adds molecular-level features as graph-level data
+    3. Includes functional group membership for attention
+    4. Adds substructure masks for targeted learning
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    
+    if feature_extractor is None:
+        feature_extractor = DeepCRAMFeatureExtractor()
+    
+    # Extract complete features
+    features = feature_extractor.extract_all_features(mol)
+    
+    num_atoms = mol.GetNumAtoms()
+    if num_atoms == 0:
+        return None
+
+    # Build graph edges (skip self-bonds; add torch.int64 self-loops)
+    edges_src = []
+    edges_dst = []
+    edge_types = []
+
+    for bond in mol.GetBonds():
+        i = bond.GetBeginAtomIdx()
+        j = bond.GetEndAtomIdx()
+        if i == j:
+            continue
+
+        edges_src.extend([i, j])
+        edges_dst.extend([j, i])
+
+        bond_type = bond.GetBondType()
+        if bond_type == Chem.BondType.SINGLE:
+            edge_types.extend([0, 0])
+        elif bond_type == Chem.BondType.DOUBLE:
+            edge_types.extend([1, 1])
+        elif bond_type == Chem.BondType.TRIPLE:
+            edge_types.extend([2, 2])
+        else:
+            edge_types.extend([3, 3])
+
+    for i in range(num_atoms):
+        edges_src.append(i)
+        edges_dst.append(i)
+        edge_types.append(0)
+
+    g = dgl.graph(
+        (torch.tensor(edges_src, dtype=torch.int64),
+         torch.tensor(edges_dst, dtype=torch.int64)),
+        num_nodes=num_atoms,
+    )
+
+    g.ndata['feat'] = torch.tensor(features['atom_features'], dtype=torch.float32)
+    g.ndata['group'] = torch.tensor(features['group_membership'], dtype=torch.float32)
+
+    for mask_name, mask in features['substructure_masks'].items():
+        g.ndata[f'mask_{mask_name}'] = torch.tensor(mask, dtype=torch.bool)
+
+    g.edata['type'] = torch.tensor(edge_types, dtype=torch.long)
+    g.mol_features = torch.tensor(features['mol_features'], dtype=torch.float32)
+
+    return g
+
+
+def smiles_to_graph(smiles, mode='unified', feature_extractor=None):
+    """Canonical SMILES → DGL graph (163D Deep CRAM features)."""
+    return smiles_to_graph_deep_cram(smiles, feature_extractor)
+
+
+deep_cram_extractor = None

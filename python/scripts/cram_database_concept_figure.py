@@ -33,7 +33,7 @@ def parse_real_ocean_data():
     if os.path.exists(surface_file):
         try:
             df_surface = pd.read_csv(surface_file, sep='\t')
-            print(f"  Surface file: {len(df_surface)} entries")
+            print(f" Surface file: {len(df_surface)} entries")
             
             # Column 27 is Smiles (0-indexed = 26)
             if 'Smiles' in df_surface.columns:
@@ -66,16 +66,16 @@ def parse_real_ocean_data():
                         except Exception as e:
                             continue
             
-            print(f"    Parsed {sum(1 for d in real_data if d['source']=='Surface')} surface compounds")
+            print(f" Parsed {sum(1 for d in real_data if d['source']=='Surface')} surface compounds")
         except Exception as e:
-            print(f"  Warning: Could not parse surface file: {e}")
+            print(f" Warning: Could not parse surface file: {e}")
     
     # Parse deep ocean results (ALSO has SMILES!)
     deep_file = 'DOM_data/deepocean_results.tsv'
     if os.path.exists(deep_file):
         try:
             df_deep = pd.read_csv(deep_file, sep='\t')
-            print(f"  Deep ocean file: {len(df_deep)} entries")
+            print(f" Deep ocean file: {len(df_deep)} entries")
             
             if 'Smiles' in df_deep.columns:
                 for idx, row in df_deep.iterrows():
@@ -107,9 +107,9 @@ def parse_real_ocean_data():
                         except Exception as e:
                             continue
             
-            print(f"    Parsed {sum(1 for d in real_data if d['source']=='Deep')} deep ocean compounds")
+            print(f" Parsed {sum(1 for d in real_data if d['source']=='Deep')} deep ocean compounds")
         except Exception as e:
-            print(f"  Warning: Could not parse deep ocean file: {e}")
+            print(f" Warning: Could not parse deep ocean file: {e}")
     
     return real_data
 
@@ -146,7 +146,7 @@ def generate_mock_ocean_data(n_samples=300, seed=42):
     
     # CRAM region - CONCENTRATED (this is the key finding!)
     # Show HIGHER DENSITY in CRAM region to indicate enrichment
-    cram_OC = np.random.uniform(0.4, 0.6, 80)  # More samples in CRAM region
+    cram_OC = np.random.uniform(0.4, 0.6, 80) # More samples in CRAM region
     cram_HC = np.random.uniform(1.2, 2.0, 80)
     for oc, hc in zip(cram_OC, cram_HC):
         data.append({'O/C': oc, 'H/C': hc, 'class': 'CRAM-like', 'is_CRAM': True})
@@ -181,17 +181,17 @@ def create_cram_discovery_figure(output_file):
     real_deep = [d for d in real_ocean_data if d['source'] == 'Deep']
     
     print(f"\nTotal compounds for visualization:")
-    print(f"  Real surface data: {len(real_surface)}")
-    print(f"  Real deep ocean data: {len(real_deep)}")
-    print(f"  Total real data: {len(real_ocean_data)}")
-    print(f"  Mock data (for concept): {len(mock_ocean_data)}")
-    print(f"  Grand total: {len(ocean_data)}")
+    print(f" Real surface data: {len(real_surface)}")
+    print(f" Real deep ocean data: {len(real_deep)}")
+    print(f" Total real data: {len(real_ocean_data)}")
+    print(f" Mock data (for concept): {len(mock_ocean_data)}")
+    print(f" Grand total: {len(ocean_data)}")
     
     # Colors
     cram_color = '#F18F01'
     ocean_color = '#2E86AB'
-    surface_color = '#00B4D8'  # Light blue for surface
-    deep_color = '#023E8A'     # Dark blue for deep ocean
+    surface_color = '#00B4D8' # Light blue for surface
+    deep_color = '#023E8A' # Dark blue for deep ocean
     database_color = '#A23B72'
     highlight_color = '#E63946'
     
@@ -330,7 +330,7 @@ def create_cram_discovery_figure(output_file):
                 ax3.scatter(compound['O/C'], compound['H/C'], 
                            c='#FF6B35', alpha=0.9, s=120, edgecolors='darkred',
                            linewidths=2.5, marker='D', zorder=6)
-            else:  # Deep
+            else: # Deep
                 ax3.scatter(compound['O/C'], compound['H/C'], 
                            c='#FF8C42', alpha=0.9, s=120, edgecolors='darkred',
                            linewidths=2.5, marker='^', zorder=6)
@@ -339,7 +339,7 @@ def create_cram_discovery_figure(output_file):
                 ax3.scatter(compound['O/C'], compound['H/C'],
                            c=surface_color, alpha=0.7, s=50, edgecolors='darkblue',
                            linewidths=1.5, marker='o', zorder=3)
-            else:  # Deep
+            else: # Deep
                 ax3.scatter(compound['O/C'], compound['H/C'],
                            c=deep_color, alpha=0.7, s=50, edgecolors='navy',
                            linewidths=1.5, marker='^', zorder=3)
@@ -440,22 +440,22 @@ def create_cram_discovery_figure(output_file):
     summary_text = """
     KEY FINDINGS:
     
-    ✓ Generated CRAM Database:
+     Generated CRAM Database:
       • 3,921 CRAM-compliant molecules
       • 39.2% meet strict CRAM criteria
       • 2,847 unique scaffolds
     
-    ✓ Ocean DOM Analysis:
+     Ocean DOM Analysis:
       • 80 CRAM-like compounds identified
       • 26.7% of total DOM in CRAM region
       • Concentrated in O/C: 0.45-0.55
     
-    ✓ Dense Region Insights:
+     Dense Region Insights:
       • High density at O/C: 0.50, H/C: 1.65
       • Suggests 20-35 isomers per sub-region
       • Indicates structural diversity hotspot
     
-    ✓ Implications:
+     Implications:
       • Generated database fills gap in
         standard molecular libraries
       • Enables CRAM identification in
@@ -476,7 +476,7 @@ def create_cram_discovery_figure(output_file):
                 fontsize=16, fontweight='bold', y=0.98)
     
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\n✓ CRAM discovery figure saved: {output_file}")
+    print(f"\n CRAM discovery figure saved: {output_file}")
     plt.close()
 
 def main():

@@ -156,8 +156,8 @@ def load_and_process_ocean_data(tsv_file, label):
     
     # Check for Smiles column
     if 'Smiles' not in df.columns:
-        print(f"  ⚠️  WARNING: No 'Smiles' column found!")
-        print(f"  Available columns: {', '.join(df.columns[:10])}...")
+        print(f" WARNING: No 'Smiles' column found!")
+        print(f" Available columns: {', '.join(df.columns[:10])}...")
         return pd.DataFrame()
     
     results = []
@@ -185,12 +185,12 @@ def load_and_process_ocean_data(tsv_file, label):
     
     result_df = pd.DataFrame(results)
     
-    print(f"\n📊 Statistics:")
-    print(f"  Valid SMILES processed: {valid_count}")
-    print(f"  High-confidence CRAM: {(result_df['CRAM_category'] == 'High-confidence CRAM').sum()}")
-    print(f"  Probable CRAM: {(result_df['CRAM_category'] == 'Probable CRAM').sum()}")
-    print(f"  CRAM-like: {(result_df['CRAM_category'] == 'CRAM-like').sum()}")
-    print(f"  Non-CRAM: {(result_df['CRAM_category'] == 'Non-CRAM').sum()}")
+    print(f"\n Statistics:")
+    print(f" Valid SMILES processed: {valid_count}")
+    print(f" High-confidence CRAM: {(result_df['CRAM_category'] == 'High-confidence CRAM').sum()}")
+    print(f" Probable CRAM: {(result_df['CRAM_category'] == 'Probable CRAM').sum()}")
+    print(f" CRAM-like: {(result_df['CRAM_category'] == 'CRAM-like').sum()}")
+    print(f" Non-CRAM: {(result_df['CRAM_category'] == 'Non-CRAM').sum()}")
     
     return result_df
 
@@ -202,11 +202,11 @@ def create_comprehensive_van_krevelen(surface_df, deep_df, output_file):
     gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.3)
     
     # Define axes
-    ax1 = fig.add_subplot(gs[0, :2])  # Main Van Krevelen
-    ax2 = fig.add_subplot(gs[0, 2])   # CRAM score distribution
-    ax3 = fig.add_subplot(gs[1, 0])   # Surface detail
-    ax4 = fig.add_subplot(gs[1, 1])   # Deep detail
-    ax5 = fig.add_subplot(gs[1, 2])   # Statistics comparison
+    ax1 = fig.add_subplot(gs[0,:2]) # Main Van Krevelen
+    ax2 = fig.add_subplot(gs[0, 2]) # CRAM score distribution
+    ax3 = fig.add_subplot(gs[1, 0]) # Surface detail
+    ax4 = fig.add_subplot(gs[1, 1]) # Deep detail
+    ax5 = fig.add_subplot(gs[1, 2]) # Statistics comparison
     
     # Combine data
     all_data = pd.concat([surface_df, deep_df], ignore_index=True)
@@ -220,7 +220,7 @@ def create_comprehensive_van_krevelen(surface_df, deep_df, output_file):
     }
     
     # SUBPLOT 1: Main Van Krevelen with all data
-    print("\n📊 Plotting main Van Krevelen diagram...")
+    print("\n Plotting main Van Krevelen diagram...")
     
     for category in ['Non-CRAM', 'CRAM-like', 'Probable CRAM', 'High-confidence CRAM']:
         cat_data = all_data[all_data['CRAM_category'] == category]
@@ -358,7 +358,7 @@ def create_comprehensive_van_krevelen(surface_df, deep_df, output_file):
                 fontsize=17, fontweight='bold', y=0.995)
     
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\n✅ Figure saved: {output_file}")
+    print(f"\n Figure saved: {output_file}")
     plt.close()
 
 def create_cram_database(all_data, output_file):
@@ -378,17 +378,17 @@ def create_cram_database(all_data, output_file):
     # Save to CSV
     cram_candidates.to_csv(output_file, index=False)
     
-    print(f"\n📊 NEW CRAM DATABASE STATISTICS:")
-    print(f"  Total CRAM candidates: {len(cram_candidates)}")
-    print(f"  High-confidence CRAM: {(cram_candidates['CRAM_category'] == 'High-confidence CRAM').sum()}")
-    print(f"  Probable CRAM: {(cram_candidates['CRAM_category'] == 'Probable CRAM').sum()}")
-    print(f"\n  Average CRAM score: {cram_candidates['CRAM_score'].mean():.1f}")
-    print(f"  Average O/C ratio: {cram_candidates['O/C'].mean():.3f}")
-    print(f"  Average H/C ratio: {cram_candidates['H/C'].mean():.3f}")
-    print(f"  Average COOH groups: {cram_candidates['COOH_groups'].mean():.1f}")
-    print(f"  Average molecular weight: {cram_candidates['MW'].mean():.1f} Da")
+    print(f"\n NEW CRAM DATABASE STATISTICS:")
+    print(f" Total CRAM candidates: {len(cram_candidates)}")
+    print(f" High-confidence CRAM: {(cram_candidates['CRAM_category'] == 'High-confidence CRAM').sum()}")
+    print(f" Probable CRAM: {(cram_candidates['CRAM_category'] == 'Probable CRAM').sum()}")
+    print(f"\n Average CRAM score: {cram_candidates['CRAM_score'].mean():.1f}")
+    print(f" Average O/C ratio: {cram_candidates['O/C'].mean():.3f}")
+    print(f" Average H/C ratio: {cram_candidates['H/C'].mean():.3f}")
+    print(f" Average COOH groups: {cram_candidates['COOH_groups'].mean():.1f}")
+    print(f" Average molecular weight: {cram_candidates['MW'].mean():.1f} Da")
     
-    print(f"\n✅ CRAM database saved: {output_file}")
+    print(f"\n CRAM database saved: {output_file}")
     print("="*70)
     
     return cram_candidates
@@ -410,7 +410,7 @@ def main():
     )
     
     if len(surface_df) == 0 and len(deep_df) == 0:
-        print("\n❌ ERROR: No valid SMILES data found in either file!")
+        print("\n ERROR: No valid SMILES data found in either file!")
         return
     
     # Combine datasets
@@ -436,25 +436,25 @@ def main():
     print(f"Surface Ocean compounds analyzed: {len(surface_df)}")
     print(f"Deep Ocean compounds analyzed: {len(deep_df)}")
     print(f"Total compounds analyzed: {len(all_data)}")
-    print(f"\n🎯 NEW CRAM CANDIDATES IDENTIFIED: {len(cram_db)}")
-    print(f"   - From Surface: {len(cram_db[cram_db['Source'] == 'Surface Ocean'])}")
-    print(f"   - From Deep: {len(cram_db[cram_db['Source'] == 'Deep Ocean'])}")
+    print(f"\n NEW CRAM CANDIDATES IDENTIFIED: {len(cram_db)}")
+    print(f" - From Surface: {len(cram_db[cram_db['Source'] == 'Surface Ocean'])}")
+    print(f" - From Deep: {len(cram_db[cram_db['Source'] == 'Deep Ocean'])}")
     
     if len(cram_db) > 0:
-        print(f"\n📈 CRAM Enrichment:")
+        print(f"\n CRAM Enrichment:")
         surface_cram = len(cram_db[cram_db['Source'] == 'Surface Ocean'])
         deep_cram = len(cram_db[cram_db['Source'] == 'Deep Ocean'])
         
         if surface_cram > 0 and len(surface_df) > 0:
             surface_pct = surface_cram / len(surface_df) * 100
-            print(f"   Surface Ocean: {surface_pct:.2f}% CRAM candidates")
+            print(f" Surface Ocean: {surface_pct:.2f}% CRAM candidates")
         
         if deep_cram > 0 and len(deep_df) > 0:
             deep_pct = deep_cram / len(deep_df) * 100
-            print(f"   Deep Ocean: {deep_pct:.2f}% CRAM candidates")
+            print(f" Deep Ocean: {deep_pct:.2f}% CRAM candidates")
     
     print("\n" + "="*70)
-    print("✅ ANALYSIS COMPLETE!")
+    print(" ANALYSIS COMPLETE!")
     print("="*70 + "\n")
 
 if __name__ == "__main__":

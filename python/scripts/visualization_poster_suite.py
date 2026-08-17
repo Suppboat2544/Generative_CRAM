@@ -39,18 +39,18 @@ plt.rcParams['ytick.major.size'] = 6
 
 # Color palettes for scientific visualization
 CRAM_COLORS = {
-    'excellent': '#2ecc71',  # Green
-    'good': '#3498db',       # Blue
-    'moderate': '#f39c12',   # Orange
-    'poor': '#e74c3c'        # Red
+    'excellent': '#2ecc71', # Green
+    'good': '#3498db', # Blue
+    'moderate': '#f39c12', # Orange
+    'poor': '#e74c3c' # Red
 }
 
 ENZYME_COLORS = {
-    'cluster_1': '#8e44ad',  # Purple
-    'cluster_2': '#16a085',  # Teal
-    'cluster_3': '#d35400',  # Dark orange
-    'cluster_4': '#c0392b',  # Dark red
-    'cluster_5': '#2c3e50'   # Dark blue-gray
+    'cluster_1': '#8e44ad', # Purple
+    'cluster_2': '#16a085', # Teal
+    'cluster_3': '#d35400', # Dark orange
+    'cluster_4': '#c0392b', # Dark red
+    'cluster_5': '#2c3e50' # Dark blue-gray
 }
 
 # ============================================================================
@@ -61,7 +61,7 @@ def visualize_cram_molecules_grid(
     molecules_data,
     save_path='cram_molecules_grid.png',
     dpi=700,
-    fig_size=(40, 30)  # A0 size in inches
+    fig_size=(40, 30) # A0 size in inches
 ):
     """
     Create high-quality grid of CRAM molecules with property annotations.
@@ -83,7 +83,7 @@ def visualize_cram_molecules_grid(
         from rdkit.Chem import Draw, AllChem
         from rdkit.Chem.Draw import IPythonConsole
     except ImportError:
-        print("⚠️ RDKit not available. Skipping molecular structure visualization.")
+        print(" RDKit not available. Skipping molecular structure visualization.")
         return
     
     n_mols = len(molecules_data)
@@ -93,7 +93,7 @@ def visualize_cram_molecules_grid(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(n_rows, n_cols, figure=fig, hspace=0.4, wspace=0.3)
     
-    print(f"📊 Generating CRAM molecule grid: {n_mols} molecules...")
+    print(f" Generating CRAM molecule grid: {n_mols} molecules...")
     
     for idx, mol_data in enumerate(molecules_data):
         row = idx // n_cols
@@ -170,7 +170,7 @@ def visualize_cram_molecules_grid(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ CRAM molecules grid saved: {save_path}")
+    print(f" CRAM molecules grid saved: {save_path}")
 
 
 def visualize_cram_3d_structures(
@@ -190,17 +190,17 @@ def visualize_cram_3d_structures(
         from rdkit.Chem.Draw import IPythonConsole
         import py3Dmol
     except ImportError:
-        print("⚠️ RDKit/py3Dmol not available. Skipping 3D visualization.")
+        print(" RDKit/py3Dmol not available. Skipping 3D visualization.")
         return
     
-    n_mols = min(len(molecules_data), 12)  # Top 12 molecules
+    n_mols = min(len(molecules_data), 12) # Top 12 molecules
     n_cols = 4
     n_rows = 3
     
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(n_rows, n_cols, figure=fig, hspace=0.3, wspace=0.3)
     
-    print(f"📊 Generating 3D CRAM structures: {n_mols} molecules...")
+    print(f" Generating 3D CRAM structures: {n_mols} molecules...")
     
     for idx in range(n_mols):
         mol_data = molecules_data[idx]
@@ -227,16 +227,16 @@ def visualize_cram_3d_structures(
         for atom in mol.GetAtoms():
             symbol = atom.GetSymbol()
             if symbol == 'C':
-                colors.append('#909090')  # Gray for carbon
+                colors.append('#909090') # Gray for carbon
                 sizes.append(300)
             elif symbol == 'O':
-                colors.append('#FF0000')  # Red for oxygen
+                colors.append('#FF0000') # Red for oxygen
                 sizes.append(400)
             elif symbol == 'N':
-                colors.append('#0000FF')  # Blue for nitrogen
+                colors.append('#0000FF') # Blue for nitrogen
                 sizes.append(350)
             else:
-                colors.append('#FFFFFF')  # White for hydrogen
+                colors.append('#FFFFFF') # White for hydrogen
                 sizes.append(100)
         
         # Plot atoms
@@ -270,7 +270,7 @@ def visualize_cram_3d_structures(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ 3D structures saved: {save_path}")
+    print(f" 3D structures saved: {save_path}")
 
 
 # ============================================================================
@@ -297,7 +297,7 @@ def visualize_enzyme_clusters(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.3)
     
-    print(f"📊 Generating enzyme cluster visualization...")
+    print(f" Generating enzyme cluster visualization...")
     
     # 1. Cluster distribution
     ax1 = fig.add_subplot(gs[0, 0])
@@ -369,7 +369,7 @@ def visualize_enzyme_clusters(
     ax4 = fig.add_subplot(gs[1, 1])
     
     # Create distance matrix (simplified - use sequence similarity)
-    n_enzymes = min(50, len(enzyme_data))  # Limit for visualization
+    n_enzymes = min(50, len(enzyme_data)) # Limit for visualization
     sample_data = enzyme_data.sample(n=n_enzymes, random_state=42)
     
     # Simplified distance matrix (random for demo)
@@ -393,10 +393,10 @@ def visualize_enzyme_clusters(
     ax4.tick_params(labelsize=24)
     
     # 5. Active site conservation heatmap
-    ax5 = fig.add_subplot(gs[2, :])
+    ax5 = fig.add_subplot(gs[2,:])
     
     # Create simplified conservation matrix
-    n_positions = 50  # Alignment length
+    n_positions = 50 # Alignment length
     n_clusters = len(enzyme_data['cluster'].unique())
     conservation_matrix = np.random.rand(n_clusters, n_positions) * 100
     
@@ -424,7 +424,7 @@ def visualize_enzyme_clusters(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ Enzyme clusters saved: {save_path}")
+    print(f" Enzyme clusters saved: {save_path}")
 
 
 # ============================================================================
@@ -458,7 +458,7 @@ def visualize_docking_poses(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(3, 4, figure=fig, hspace=0.4, wspace=0.3)
     
-    print(f"📊 Generating docking poses visualization...")
+    print(f" Generating docking poses visualization...")
     
     for idx, result in enumerate(docking_results):
         row = idx // 4
@@ -538,7 +538,7 @@ def visualize_docking_poses(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ Docking poses saved: {save_path}")
+    print(f" Docking poses saved: {save_path}")
 
 
 # ============================================================================
@@ -559,13 +559,13 @@ def visualize_binding_affinity_comparison(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.3)
     
-    print(f"📊 Generating binding affinity comparison...")
+    print(f" Generating binding affinity comparison...")
     
     # Convert to DataFrame
     df = pd.DataFrame(docking_results)
     
     # 1. Top 20 complexes by binding affinity
-    ax1 = fig.add_subplot(gs[0, :])
+    ax1 = fig.add_subplot(gs[0,:])
     
     top_20 = df.nsmallest(20, 'binding_affinity')
     
@@ -728,7 +728,7 @@ def visualize_binding_affinity_comparison(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ Binding affinity comparison saved: {save_path}")
+    print(f" Binding affinity comparison saved: {save_path}")
 
 
 # ============================================================================
@@ -762,14 +762,14 @@ def visualize_md_trajectories(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(4, 3, figure=fig, hspace=0.4, wspace=0.4)
     
-    print(f"📊 Generating MD trajectories visualization...")
+    print(f" Generating MD trajectories visualization...")
     
     # Select top 6 complexes by stability
     top_complexes = sorted(md_results, 
                           key=lambda x: np.mean(x['rmsd']))[:6]
     
     # 1. RMSD trajectories
-    ax1 = fig.add_subplot(gs[0, :])
+    ax1 = fig.add_subplot(gs[0,:])
     
     for i, result in enumerate(top_complexes):
         cluster_color = ENZYME_COLORS[f'cluster_{result["cluster"]+1}']
@@ -892,7 +892,7 @@ def visualize_md_trajectories(
     ax7.tick_params(labelsize=24)
     
     # 8. RMSF (Root Mean Square Fluctuation) per residue
-    ax8 = fig.add_subplot(gs[3, :2])
+    ax8 = fig.add_subplot(gs[3,:2])
     
     for result in top_complexes[:3]:
         cluster_color = ENZYME_COLORS[f'cluster_{result["cluster"]+1}']
@@ -940,7 +940,7 @@ def visualize_md_trajectories(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ MD trajectories saved: {save_path}")
+    print(f" MD trajectories saved: {save_path}")
 
 
 # ============================================================================
@@ -968,7 +968,7 @@ def create_summary_dashboard(
     fig = plt.figure(figsize=fig_size, dpi=dpi)
     gs = GridSpec(4, 4, figure=fig, hspace=0.5, wspace=0.4)
     
-    print(f"📊 Generating comprehensive summary dashboard...")
+    print(f" Generating comprehensive summary dashboard...")
     
     # Convert to DataFrames
     df_cram = pd.DataFrame(cram_data)
@@ -1220,7 +1220,7 @@ def create_summary_dashboard(
     ax12.tick_params(labelsize=20)
     
     # 13. Overall Pipeline Success Metrics
-    ax13 = fig.add_subplot(gs[3, :2])
+    ax13 = fig.add_subplot(gs[3,:2])
     
     metrics = {
         'Valid CRAM': (df_cram['cram_score'] > 0.5).sum() / len(df_cram) * 100,
@@ -1296,9 +1296,9 @@ def create_summary_dashboard(
                facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"✅ Summary dashboard saved: {save_path}")
+    print(f" Summary dashboard saved: {save_path}")
     print("\n" + "="*80)
-    print("📊 VISUALIZATION SUITE COMPLETE")
+    print(" VISUALIZATION SUITE COMPLETE")
     print("="*80)
 
 
@@ -1319,8 +1319,8 @@ def generate_demo_data():
     
     for i in range(n_molecules):
         cram_data.append({
-            'smiles': f'C1CCC(C(=O)O)CC1CCC(=O)O_mol{i}',  # Simplified SMILES
-            'cram_score': np.random.beta(5, 2),  # Skewed towards high scores
+            'smiles': f'C1CCC(C(=O)O)CC1CCC(=O)O_mol{i}', # Simplified SMILES
+            'cram_score': np.random.beta(5, 2), # Skewed towards high scores
             'carboxyl_count': np.random.choice([1, 2, 3, 4], p=[0.2, 0.4, 0.3, 0.1]),
             'aliphatic_percent': np.random.normal(75, 10),
             'mw': np.random.normal(300, 75),
@@ -1334,7 +1334,7 @@ def generate_demo_data():
     for i in range(n_enzymes):
         cluster = np.random.choice([0, 1, 2, 3, 4])
         enzyme_data.append({
-            'sequence': 'MKVLWAALLVTFLAGCQAKV' * 10,  # Dummy sequence
+            'sequence': 'MKVLWAALLVTFLAGCQAKV' * 10, # Dummy sequence
             'cluster': cluster,
             'plddt': np.random.normal(80, 10),
             'active_site_residues': list(range(50, 70))
@@ -1364,7 +1364,7 @@ def generate_demo_data():
     md_results = []
     
     for i in range(n_md):
-        time = np.linspace(0, 100, 1000)  # 100 ns simulation
+        time = np.linspace(0, 100, 1000) # 100 ns simulation
         cluster = np.random.choice([0, 1, 2, 3, 4])
         
         # Generate realistic trajectories
@@ -1374,7 +1374,7 @@ def generate_demo_data():
         
         pe = np.random.normal(-150000, 5000, 1000)
         ke = np.random.normal(50000, 2000, 1000)
-        temp = np.random.normal(277, 5, 1000)  # Deep-sea temperature
+        temp = np.random.normal(277, 5, 1000) # Deep-sea temperature
         
         h_bonds = np.random.poisson(8, 1000)
         salt_bridges = np.random.poisson(3, 1000)
@@ -1400,7 +1400,7 @@ def generate_demo_data():
 
 if __name__ == '__main__':
     print("\n" + "="*80)
-    print("🎨 CRAM GENERATOR VISUALIZATION SUITE")
+    print(" CRAM GENERATOR VISUALIZATION SUITE")
     print("="*80)
     print("\nGenerating high-resolution visualizations for A0 poster (700 DPI)...")
     print("This may take several minutes...\n")
@@ -1408,17 +1408,17 @@ if __name__ == '__main__':
     # Generate demo data (replace with your actual data)
     cram_data, enzyme_data, docking_results, md_results = generate_demo_data()
     
-    print(f"📊 Loaded data:")
-    print(f"  - CRAM molecules: {len(cram_data)}")
-    print(f"  - Enzymes: {len(enzyme_data)}")
-    print(f"  - Docking results: {len(docking_results)}")
-    print(f"  - MD simulations: {len(md_results)}")
+    print(f" Loaded data:")
+    print(f" - CRAM molecules: {len(cram_data)}")
+    print(f" - Enzymes: {len(enzyme_data)}")
+    print(f" - Docking results: {len(docking_results)}")
+    print(f" - MD simulations: {len(md_results)}")
     print()
     
     # Generate all visualizations
     try:
         # 1. CRAM Molecules
-        visualize_cram_molecules_grid(cram_data[:25])  # Top 25 molecules
+        visualize_cram_molecules_grid(cram_data[:25]) # Top 25 molecules
         visualize_cram_3d_structures(sorted(cram_data, 
                                            key=lambda x: x['cram_score'], 
                                            reverse=True)[:12])
@@ -1440,20 +1440,20 @@ if __name__ == '__main__':
                                 docking_results, md_results)
         
         print("\n" + "="*80)
-        print("✅ ALL VISUALIZATIONS GENERATED SUCCESSFULLY!")
+        print(" ALL VISUALIZATIONS GENERATED SUCCESSFULLY!")
         print("="*80)
         print("\nGenerated files:")
-        print("  1. cram_molecules_grid.png - 2D molecular structures")
-        print("  2. cram_3d_structures.png - 3D conformers")
-        print("  3. enzyme_clusters.png - Enzyme analysis")
-        print("  4. docking_poses.png - Docking visualizations")
-        print("  5. binding_affinity_comparison.png - Affinity analysis")
-        print("  6. md_trajectories.png - MD simulation results")
-        print("  7. summary_dashboard.png - Comprehensive dashboard")
+        print(" 1. cram_molecules_grid.png - 2D molecular structures")
+        print(" 2. cram_3d_structures.png - 3D conformers")
+        print(" 3. enzyme_clusters.png - Enzyme analysis")
+        print(" 4. docking_poses.png - Docking visualizations")
+        print(" 5. binding_affinity_comparison.png - Affinity analysis")
+        print(" 6. md_trajectories.png - MD simulation results")
+        print(" 7. summary_dashboard.png - Comprehensive dashboard")
         print("\nAll files are optimized for A0 poster at 700 DPI")
         print("="*80 + "\n")
         
     except Exception as e:
-        print(f"\n❌ Error during visualization: {e}")
+        print(f"\n Error during visualization: {e}")
         import traceback
         traceback.print_exc()

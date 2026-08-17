@@ -49,8 +49,8 @@ ax1.legend(loc='upper right', frameon=True, shadow=True)
 ax2 = fig.add_subplot(gs[0, 1])
 # KL divergence with controlled annealing
 kl_div = 168.3 * np.exp(-0.12 * epochs) + 4.21
-kl_div[:10] = np.linspace(168.3, 50, 10)  # Initial rapid decrease
-kl_div[10:50] = 50 * np.exp(-0.08 * (epochs[10:50] - 10)) + 4.21  # Annealing period
+kl_div[:10] = np.linspace(168.3, 50, 10) # Initial rapid decrease
+kl_div[10:50] = 50 * np.exp(-0.08 * (epochs[10:50] - 10)) + 4.21 # Annealing period
 ax2.plot(epochs, kl_div, linewidth=2.5, color='#F18F01', label='KL Divergence')
 ax2.axhspan(2, 8, alpha=0.2, color='green', label='Target Range (2-8)')
 ax2.axhline(y=4.21, color='gray', linestyle=':', alpha=0.5, label='Final: 4.21')
@@ -82,7 +82,7 @@ ax4.legend(loc='upper right', frameon=True, shadow=True)
 
 plt.savefig('figures/training_curves.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/training_curves.png")
+print(" Saved: figures/training_curves.png")
 
 # ============================================================================
 # Figure 2: Property Correlations Heatmap (property_correlations.png)
@@ -92,11 +92,11 @@ print("\n2. Generating property_correlations.png...")
 # Create correlation matrix based on reported values
 properties = ['COOH\nCount', 'O/C\nRatio', 'Aliphatic\n%', 'Ring\nCount', 'Molecular\nWeight']
 corr_matrix = np.array([
-    [1.00, 0.78, 0.12, -0.18, 0.61],  # COOH
-    [0.78, 1.00, 0.09, -0.25, 0.52],  # O/C
-    [0.12, 0.09, 1.00, -0.42, 0.15],  # Aliphatic%
-    [-0.18, -0.25, -0.42, 1.00, 0.34],  # Rings
-    [0.61, 0.52, 0.15, 0.34, 1.00]   # MW
+    [1.00, 0.78, 0.12, -0.18, 0.61], # COOH
+    [0.78, 1.00, 0.09, -0.25, 0.52], # O/C
+    [0.12, 0.09, 1.00, -0.42, 0.15], # Aliphatic%
+    [-0.18, -0.25, -0.42, 1.00, 0.34], # Rings
+    [0.61, 0.52, 0.15, 0.34, 1.00] # MW
 ])
 
 fig, ax = plt.subplots(figsize=(10, 8))
@@ -132,7 +132,7 @@ for i in range(len(properties)):
 plt.tight_layout()
 plt.savefig('figures/property_correlations.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/property_correlations.png")
+print(" Saved: figures/property_correlations.png")
 
 # ============================================================================
 # Figure 3: Latent Space t-SNE Visualization (latent_tsne.png)
@@ -206,7 +206,7 @@ ax3.legend(loc='best', frameon=True, shadow=True, fontsize=10)
 
 plt.savefig('figures/latent_tsne.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/latent_tsne.png")
+print(" Saved: figures/latent_tsne.png")
 
 # ============================================================================
 # Figure 4: Property Distributions (property_distributions.png)
@@ -236,7 +236,7 @@ for bar in bars1:
 # Subplot 2: Alicyclic Ring Count Distribution
 ax2 = fig.add_subplot(gs[0, 1])
 ring_counts = ['0 rings', '1 ring', '2 rings', '3+ rings']
-ring_count_percentages = [26.2, 42.8, 21.3, 9.7]  # Based on 73.8% having ≥1 ring, avg 1.84
+ring_count_percentages = [26.2, 42.8, 21.3, 9.7] # Based on 73.8% having ≥1 ring, avg 1.84
 colors2 = ['#A8DADC', '#457B9D', '#1D3557', '#E63946']
 bars2 = ax2.bar(ring_counts, ring_count_percentages, color=colors2, edgecolor='black', linewidth=1.5)
 ax2.set_xlabel('Alicyclic Ring Count', fontsize=11, fontweight='bold')
@@ -283,7 +283,7 @@ ax4.legend(loc='upper right', frameon=True, shadow=True)
 
 plt.savefig('figures/property_distributions.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/property_distributions.png")
+print(" Saved: figures/property_distributions.png")
 
 # ============================================================================
 # Figure 4.5: Ring Size Distribution (ring_size_distribution.png)
@@ -316,7 +316,7 @@ ax.text(0.98, 0.95, textstr, transform=ax.transAxes, fontsize=11,
 plt.tight_layout()
 plt.savefig('figures/ring_size_distribution.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/ring_size_distribution.png")
+print(" Saved: figures/ring_size_distribution.png")
 
 # ============================================================================
 # Figure 5: Structural Diversity Analysis (structural_diversity.png)
@@ -328,7 +328,7 @@ gs = GridSpec(1, 2, figure=fig, wspace=0.3)
 
 # Subplot 1: Tanimoto Similarity Distribution
 ax1 = fig.add_subplot(gs[0, 0])
-tanimoto_data = np.random.beta(2, 5, 10000) * 0.7  # Biased towards low similarity
+tanimoto_data = np.random.beta(2, 5, 10000) * 0.7 # Biased towards low similarity
 tanimoto_data = np.clip(tanimoto_data, 0, 1)
 ax1.hist(tanimoto_data, bins=40, color='#4361EE', alpha=0.7, edgecolor='black', linewidth=1)
 ax1.axvline(x=0.28, color='red', linestyle='--', linewidth=2.5, label='Mean: 0.28 ± 0.14')
@@ -343,7 +343,7 @@ ax1.legend(loc='upper right', frameon=True, shadow=True, fontsize=11)
 ax2 = fig.add_subplot(gs[0, 1])
 # Generate scaffold frequency data (Zipf-like distribution)
 scaffold_ranks = np.arange(1, 101)
-scaffold_frequencies = 100 / (scaffold_ranks ** 0.7)  # Power law
+scaffold_frequencies = 100 / (scaffold_ranks ** 0.7) # Power law
 scaffold_frequencies = scaffold_frequencies / scaffold_frequencies.sum() * 3921
 
 ax2.bar(scaffold_ranks, scaffold_frequencies, color='#F72585', alpha=0.7, 
@@ -365,7 +365,7 @@ ax2.text(0.98, 0.97, textstr, transform=ax2.transAxes, fontsize=11,
 
 plt.savefig('figures/structural_diversity.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/structural_diversity.png")
+print(" Saved: figures/structural_diversity.png")
 
 # ============================================================================
 # Figure 6: C3-Cq Feature Comparison (tertiary_carbon_comparison.png)
@@ -464,22 +464,22 @@ ax4.set_ylim(78, 95)
 
 plt.savefig('figures/tertiary_carbon_comparison.png', dpi=700, bbox_inches='tight')
 plt.close()
-print("   ✓ Saved: figures/tertiary_carbon_comparison.png (4 panels: A-D)")
+print(" Saved: figures/tertiary_carbon_comparison.png (4 panels: A-D)")
 
 
 # ============================================================================
 # Summary
 # ============================================================================
 print("\n" + "=" * 60)
-print("✓ All figures generated successfully!")
+print(" All figures generated successfully!")
 print("\nGenerated files:")
-print("  1. figures/training_curves.png")
-print("  2. figures/property_correlations.png")
-print("  3. figures/latent_tsne.png")
-print("  4. figures/property_distributions.png (with alicyclic ring count)")
-print("  4.5. figures/ring_size_distribution.png (5/6/7+ membered)")
-print("  5. figures/structural_diversity.png")
-print("  6. figures/tertiary_carbon_comparison.png (4 panels: A-D)")
+print(" 1. figures/training_curves.png")
+print(" 2. figures/property_correlations.png")
+print(" 3. figures/latent_tsne.png")
+print(" 4. figures/property_distributions.png (with alicyclic ring count)")
+print(" 4.5. figures/ring_size_distribution.png (5/6/7+ membered)")
+print(" 5. figures/structural_diversity.png")
+print(" 6. figures/tertiary_carbon_comparison.png (4 panels: A-D)")
 print("\nThese figures are ready to be referenced in the merged")
 print("Results and Discussion section of your LaTeX paper.")
 print("\nNote: All grids have been removed from plots as requested.")

@@ -11,7 +11,7 @@ from .utils import draw_molecule, format_validation
 def create_validation_tab(validator):
     """Create the validation tab interface."""
     
-    with gr.TabItem("🔬 Validate", id="validate"):
+    with gr.TabItem("Validate", id="validate"):
         gr.Markdown("""
         ### Single Molecule Validation
         Enter a SMILES string to validate if it's a CRAM molecule.
@@ -26,8 +26,8 @@ def create_validation_tab(validator):
                 )
                 
                 with gr.Row():
-                    validate_btn = gr.Button("🔍 Validate", variant="primary", scale=2)
-                    clear_btn = gr.Button("🗑️ Clear", scale=1)
+                    validate_btn = gr.Button("Validate", variant="primary", scale=2)
+                    clear_btn = gr.Button("Clear", scale=1)
                 
                 gr.Markdown("""
                 ---

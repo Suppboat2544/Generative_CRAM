@@ -108,7 +108,7 @@ border = Border(
 # Sheet 1: Property Conditioning Accuracy
 ws1 = wb.create_sheet('Property Conditioning')
 ws1.append(['Property Conditioning Accuracy'])
-ws1.append([])  # Empty row
+ws1.append([]) # Empty row
 
 # Merge and style title
 ws1.merge_cells('A1:D1')
@@ -139,7 +139,7 @@ ws1.column_dimensions['D'].width = 12
 # Sheet 2: Performance vs Baseline Models
 ws2 = wb.create_sheet('Baseline Comparison')
 ws2.append(['Performance vs Baseline Generative Models'])
-ws2.append([])  # Empty row
+ws2.append([]) # Empty row
 
 # Merge and style title
 ws2.merge_cells('A1:E1')
@@ -162,7 +162,7 @@ for row_idx, row in enumerate(dataframe_to_rows(df_baseline, index=False, header
         cell.alignment = Alignment(horizontal='center')
         
         # Highlight "Our Model" row
-        if row_idx == 8:  # Last row (Our Model)
+        if row_idx == 8: # Last row (Our Model)
             cell.fill = highlight_fill
             cell.font = highlight_font
 
@@ -177,8 +177,8 @@ ws2.column_dimensions['E'].width = 12
 output_file = 'CRAM_Model_Tables.xlsx'
 wb.save(output_file)
 
-print(f"✅ Excel file created successfully: {output_file}")
+print(f" Excel file created successfully: {output_file}")
 print(f"\nSheets created:")
-print(f"  1. Property Conditioning - {len(df_conditioning)} rows")
-print(f"  2. Baseline Comparison - {len(df_baseline)} rows")
+print(f" 1. Property Conditioning - {len(df_conditioning)} rows")
+print(f" 2. Baseline Comparison - {len(df_baseline)} rows")
 print(f"\nFile saved to: {output_file}")

@@ -21,10 +21,10 @@ print("COMPREHENSIVE DOM-CRAM ANALYSIS")
 print("="*75)
 
 df = pd.read_csv("dom_cram_dataset.csv")
-print(f"\n✓ Loaded dataset: {len(df)} formulas")
+print(f"\n Loaded dataset: {len(df)} formulas")
 
 palette = {
-    "deep":    "#f4a442",
+    "deep": "#f4a442",
     "surface": "#5ba3d0",
     "coastal": "#3d9970",
 }
@@ -52,7 +52,7 @@ df["NOSC"] = 4 - ((4*df["C"] + df["H"] - 2*df["O"]) / df["C"])
 # Carbon oxidation state
 df["OSc"] = 2*df["O"]/df["C"] - df["H"]/df["C"]
 
-print("✓ Calculated: AI, AImod, NOSC, OSc")
+print(" Calculated: AI, AImod, NOSC, OSc")
 
 # =============== 2. CREATE SHARED LEGEND FOR a-c) PLOTS ===============
 print("\nGenerating shared legend for VKD plots...")
@@ -78,7 +78,7 @@ legend.get_title().set_fontweight('bold')
 
 plt.tight_layout()
 plt.savefig("vkd_shared_legend.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: vkd_shared_legend.png")
+print(" Saved: vkd_shared_legend.png")
 plt.close()
 
 # =============== 3. COMPREHENSIVE STATISTICAL ANALYSIS ===============
@@ -113,7 +113,7 @@ for env in ["coastal", "surface", "deep"]:
         mean_val = sub[prop].mean()
         std_val = sub[prop].std()
         env_stats[env][prop] = {'mean': mean_val, 'std': std_val}
-        print(f"  {prop:8s}: {mean_val:7.3f} ± {std_val:6.3f}")
+        print(f" {prop:8s}: {mean_val:7.3f} ± {std_val:6.3f}")
 
 analysis_results['env_stats'] = env_stats
 
@@ -152,10 +152,10 @@ for env in ["coastal", "surface", "deep"]:
         'non_cram_isomers_mean': non_cram_sub['isomers_pubchem_cram'].mean(),
     }
     print(f"\n{env.capitalize()} sea:")
-    print(f"  CRAM formulas: {cram_char[env]['n_cram']} ({cram_char[env]['pct_cram']:.1f}%)")
-    print(f"  CRAM mass: {cram_char[env]['cram_mass_mean']:.2f} Da")
-    print(f"  CRAM DBE: {cram_char[env]['cram_dbe_mean']:.2f}")
-    print(f"  CRAM isomers: {cram_char[env]['cram_isomers_mean']:.2f}")
+    print(f" CRAM formulas: {cram_char[env]['n_cram']} ({cram_char[env]['pct_cram']:.1f}%)")
+    print(f" CRAM mass: {cram_char[env]['cram_mass_mean']:.2f} Da")
+    print(f" CRAM DBE: {cram_char[env]['cram_dbe_mean']:.2f}")
+    print(f" CRAM isomers: {cram_char[env]['cram_isomers_mean']:.2f}")
 
 analysis_results['cram_char'] = cram_char
 
@@ -192,7 +192,7 @@ ax.legend(fontsize=8, frameon=True, framealpha=0.9)
 sns.despine(ax=ax)
 plt.tight_layout()
 plt.savefig("dbe_vs_oc.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: dbe_vs_oc.png")
+print(" Saved: dbe_vs_oc.png")
 plt.close()
 
 # =============== 5. PLOT e) PCA ANALYSIS ===============
@@ -209,8 +209,8 @@ X_scaled = scaler.fit_transform(X)
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
-print(f"  PC1 explains {pca.explained_variance_ratio_[0]*100:.1f}% variance")
-print(f"  PC2 explains {pca.explained_variance_ratio_[1]*100:.1f}% variance")
+print(f" PC1 explains {pca.explained_variance_ratio_[0]*100:.1f}% variance")
+print(f" PC2 explains {pca.explained_variance_ratio_[1]*100:.1f}% variance")
 
 # Store PCA results
 analysis_results['pca'] = {
@@ -251,7 +251,7 @@ for ax in axes:
 
 plt.tight_layout()
 plt.savefig("pca_analysis.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: pca_analysis.png")
+print(" Saved: pca_analysis.png")
 plt.close()
 
 # =============== 6. PLOT f) ISOMER SPATIAL PATTERNS ===============
@@ -425,7 +425,7 @@ for ax in [ax_bl, ax_bm, ax_br]:
 
 plt.tight_layout()
 plt.savefig("isomer_spatial_patterns.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: isomer_spatial_patterns.png")
+print(" Saved: isomer_spatial_patterns.png")
 plt.close()
 
 # =============== 7. CORRELATION ANALYSIS ===============
@@ -471,7 +471,7 @@ for idx, (prop, label) in enumerate(properties_plot):
 
 plt.tight_layout()
 plt.savefig("property_distributions.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: property_distributions.png")
+print(" Saved: property_distributions.png")
 plt.close()
 
 # Correlation heatmaps
@@ -490,7 +490,7 @@ for idx, env in enumerate(["coastal", "surface", "deep"]):
 
 plt.tight_layout()
 plt.savefig("correlation_heatmaps.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: correlation_heatmaps.png")
+print(" Saved: correlation_heatmaps.png")
 plt.close()
 
 # CRAM characterization
@@ -538,7 +538,7 @@ for ax in axes.flat:
 
 plt.tight_layout()
 plt.savefig("cram_characterization.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: cram_characterization.png")
+print(" Saved: cram_characterization.png")
 plt.close()
 
 # 3D plots
@@ -574,7 +574,7 @@ cbar.set_label("Isomers", fontsize=9)
 
 plt.tight_layout()
 plt.savefig("3d_molecular_space.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: 3d_molecular_space.png")
+print(" Saved: 3d_molecular_space.png")
 plt.close()
 
 # =============== ADDITIONAL VISUALIZATIONS FOR APPENDIX ===============
@@ -622,7 +622,7 @@ ax.legend(fontsize=10, loc='upper right', framealpha=0.95)
 sns.despine(ax=ax)
 plt.tight_layout()
 plt.savefig("pca_biplot_loadings.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: pca_biplot_loadings.png")
+print(" Saved: pca_biplot_loadings.png")
 plt.close()
 
 # =============== B. ISOMER ENRICHMENT BAR CHART ===============
@@ -660,7 +660,7 @@ ax.legend(fontsize=10, loc='upper left', framealpha=0.95)
 sns.despine(ax=ax)
 plt.tight_layout()
 plt.savefig("isomer_enrichment_factors.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: isomer_enrichment_factors.png")
+print(" Saved: isomer_enrichment_factors.png")
 plt.close()
 
 # =============== C. ENVIRONMENTAL PROPERTY GRADIENTS ===============
@@ -713,7 +713,7 @@ plt.suptitle("Environmental Gradients in Marine DOM Properties\n" +
              fontsize=14, weight='bold', y=0.995)
 plt.tight_layout(rect=[0, 0, 1, 0.98])
 plt.savefig("environmental_property_gradients.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: environmental_property_gradients.png")
+print(" Saved: environmental_property_gradients.png")
 plt.close()
 
 # =============== D. BASELINE MODEL COMPARISON CHART ===============
@@ -782,7 +782,7 @@ plt.suptitle("Baseline Model Performance Comparison\nOur Model (Property-Conditi
              fontsize=14, weight='bold', y=0.995)
 plt.tight_layout(rect=[0, 0, 1, 0.98])
 plt.savefig("baseline_comparison_chart.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: baseline_comparison_chart.png")
+print(" Saved: baseline_comparison_chart.png")
 plt.close()
 
 # =============== E. COMBINED ISOMER ANALYSIS FIGURE ===============
@@ -931,18 +931,18 @@ plt.suptitle("Comprehensive Isomer Analysis: CRAM Enrichment and Correlations",
              fontsize=15, weight='bold', y=0.995)
 plt.tight_layout(rect=[0, 0, 1, 0.98])
 plt.savefig("comprehensive_isomer_analysis.png", dpi=700, bbox_inches='tight')
-print("✓ Saved: comprehensive_isomer_analysis.png")
+print(" Saved: comprehensive_isomer_analysis.png")
 plt.close()
 
 print("\n" + "="*75)
-print("✓ ADDITIONAL VISUALIZATIONS COMPLETE")
+print(" ADDITIONAL VISUALIZATIONS COMPLETE")
 print("="*75)
 print("New figures for appendix:")
-print("  • pca_biplot_loadings.png               - PCA with loading vectors")
-print("  • isomer_enrichment_factors.png         - Bar chart (6.4× enrichment)")
-print("  • environmental_property_gradients.png  - 6-panel gradient figure")
-print("  • baseline_comparison_chart.png         - 4-metric model comparison")
-print("  • comprehensive_isomer_analysis.png     - 6-panel isomer analysis")
+print(" • pca_biplot_loadings.png - PCA with loading vectors")
+print(" • isomer_enrichment_factors.png - Bar chart (6.4× enrichment)")
+print(" • environmental_property_gradients.png - 6-panel gradient figure")
+print(" • baseline_comparison_chart.png - 4-metric model comparison")
+print(" • comprehensive_isomer_analysis.png - 6-panel isomer analysis")
 print("="*75 + "\n")
 
 # =============== 9. COMPREHENSIVE TEXT OUTPUT ===============
@@ -970,7 +970,7 @@ with open("analysis_summary_comprehensive.txt", "w") as f:
         f.write(f"\n{env.upper()} SEA:\n")
         stats_env = env_stats[env]
         for prop in properties:
-            f.write(f"  {prop:12s}: {stats_env[prop]['mean']:8.3f} ± {stats_env[prop]['std']:7.3f}\n")
+            f.write(f" {prop:12s}: {stats_env[prop]['mean']:8.3f} ± {stats_env[prop]['std']:7.3f}\n")
     
     # ANOVA results
     f.write("\n\n3. STATISTICAL TESTS: ENVIRONMENT COMPARISONS (ANOVA)\n")
@@ -1000,14 +1000,14 @@ with open("analysis_summary_comprehensive.txt", "w") as f:
     for env in ["coastal", "surface", "deep"]:
         char = cram_char[env]
         f.write(f"\n{env.upper()} SEA:\n")
-        f.write(f"  CRAM formulas:         {char['n_cram']} ({char['pct_cram']:.1f}%)\n")
-        f.write(f"  Non-CRAM formulas:     {char['n_non_cram']} ({100-char['pct_cram']:.1f}%)\n")
-        f.write(f"  CRAM mass (avg):       {char['cram_mass_mean']:.2f} Da\n")
-        f.write(f"  Non-CRAM mass (avg):   {char['non_cram_mass_mean']:.2f} Da\n")
-        f.write(f"  CRAM DBE (avg):        {char['cram_dbe_mean']:.2f}\n")
-        f.write(f"  Non-CRAM DBE (avg):    {char['non_cram_dbe_mean']:.2f}\n")
-        f.write(f"  CRAM isomers (avg):    {char['cram_isomers_mean']:.2f}\n")
-        f.write(f"  Non-CRAM isomers(avg): {char['non_cram_isomers_mean']:.2f}\n")
+        f.write(f" CRAM formulas: {char['n_cram']} ({char['pct_cram']:.1f}%)\n")
+        f.write(f" Non-CRAM formulas: {char['n_non_cram']} ({100-char['pct_cram']:.1f}%)\n")
+        f.write(f" CRAM mass (avg): {char['cram_mass_mean']:.2f} Da\n")
+        f.write(f" Non-CRAM mass (avg): {char['non_cram_mass_mean']:.2f} Da\n")
+        f.write(f" CRAM DBE (avg): {char['cram_dbe_mean']:.2f}\n")
+        f.write(f" Non-CRAM DBE (avg): {char['non_cram_dbe_mean']:.2f}\n")
+        f.write(f" CRAM isomers (avg): {char['cram_isomers_mean']:.2f}\n")
+        f.write(f" Non-CRAM isomers(avg): {char['non_cram_isomers_mean']:.2f}\n")
     
     # Isomer enrichment
     f.write("\n\n6. ISOMER ENRICHMENT FACTORS (CRAM / Non-CRAM)\n")
@@ -1022,10 +1022,10 @@ with open("analysis_summary_comprehensive.txt", "w") as f:
     f.write(f"PC2 variance explained: {analysis_results['pca']['pc2_variance']:.2f}%\n\n")
     f.write("PC1 Loadings:\n")
     for feat, load in analysis_results['pca']['pc1_loadings'].items():
-        f.write(f"  {feat:12s}: {load:7.3f}\n")
+        f.write(f" {feat:12s}: {load:7.3f}\n")
     f.write("\nPC2 Loadings:\n")
     for feat, load in analysis_results['pca']['pc2_loadings'].items():
-        f.write(f"  {feat:12s}: {load:7.3f}\n")
+        f.write(f" {feat:12s}: {load:7.3f}\n")
     
     # Correlations
     f.write("\n\n8. CORRELATION ANALYSIS\n")
@@ -1036,7 +1036,7 @@ with open("analysis_summary_comprehensive.txt", "w") as f:
         corr_with_iso = correlations[env]['isomers_pubchem_cram']
         sorted_corr = sorted(corr_with_iso.items(), key=lambda x: abs(x[1]), reverse=True)[1:6]
         for prop, corr_val in sorted_corr:
-            f.write(f"  {prop:12s}: r = {corr_val:6.3f}\n")
+            f.write(f" {prop:12s}: r = {corr_val:6.3f}\n")
         f.write("\n")
     
     # Summary
@@ -1054,32 +1054,32 @@ with open("analysis_summary_comprehensive.txt", "w") as f:
     f.write("Analysis completed: All results saved\n")
     f.write("="*80 + "\n")
 
-print("✓ Saved: analysis_summary_comprehensive.txt")
+print(" Saved: analysis_summary_comprehensive.txt")
 
 # =============== FINAL SUMMARY ===============
 print("\n" + "="*75)
 print("COMPLETE! Generated comprehensive analysis:")
 print("="*75)
 print("Original VKD plots:")
-print("  1. dom_cram_dataset.csv                   - Full validated CHO dataset")
-print("  2. vkd_pubchem_only.png                   - a) PubChem VKD (700 DPI)")
-print("  3. vkd_pubchem_cram.png                   - b) PubChem+CRAM VKD (700 DPI)")
-print("  4. isomer_comparison.png                  - c) Isomer distribution (700 DPI)")
-print("  5. vkd_shared_legend.png                  - Shared legend (700 DPI)")
+print(" 1. dom_cram_dataset.csv - Full validated CHO dataset")
+print(" 2. vkd_pubchem_only.png - a) PubChem VKD (700 DPI)")
+print(" 3. vkd_pubchem_cram.png - b) PubChem+CRAM VKD (700 DPI)")
+print(" 4. isomer_comparison.png - c) Isomer distribution (700 DPI)")
+print(" 5. vkd_shared_legend.png - Shared legend (700 DPI)")
 print("\nCore analyses:")
-print("  6. dbe_vs_oc.png                          - Aromaticity patterns (700 DPI)")
-print("  7. pca_analysis.png                       - PCA analysis (700 DPI)")
-print("  8. isomer_spatial_patterns.png            - Isomer patterns a-i (700 DPI)")
-print("  9. property_distributions.png             - Violin plots (700 DPI)")
-print(" 10. correlation_heatmaps.png               - Correlation matrices (700 DPI)")
-print(" 11. cram_characterization.png              - CRAM characterization (700 DPI)")
-print(" 12. 3d_molecular_space.png                 - 3D molecular space (700 DPI)")
+print(" 6. dbe_vs_oc.png - Aromaticity patterns (700 DPI)")
+print(" 7. pca_analysis.png - PCA analysis (700 DPI)")
+print(" 8. isomer_spatial_patterns.png - Isomer patterns a-i (700 DPI)")
+print(" 9. property_distributions.png - Violin plots (700 DPI)")
+print(" 10. correlation_heatmaps.png - Correlation matrices (700 DPI)")
+print(" 11. cram_characterization.png - CRAM characterization (700 DPI)")
+print(" 12. 3d_molecular_space.png - 3D molecular space (700 DPI)")
 print("\nAppendix-specific figures:")
-print(" 13. pca_biplot_loadings.png                - PCA with loading vectors (700 DPI)")
-print(" 14. isomer_enrichment_factors.png          - Enrichment bar chart (700 DPI)")
-print(" 15. environmental_property_gradients.png   - Property gradients 6-panel (700 DPI)")
-print(" 16. baseline_comparison_chart.png          - Model comparison 4-panel (700 DPI)")
-print(" 17. comprehensive_isomer_analysis.png      - Isomer analysis 6-panel (700 DPI)")
+print(" 13. pca_biplot_loadings.png - PCA with loading vectors (700 DPI)")
+print(" 14. isomer_enrichment_factors.png - Enrichment bar chart (700 DPI)")
+print(" 15. environmental_property_gradients.png - Property gradients 6-panel (700 DPI)")
+print(" 16. baseline_comparison_chart.png - Model comparison 4-panel (700 DPI)")
+print(" 17. comprehensive_isomer_analysis.png - Isomer analysis 6-panel (700 DPI)")
 print("\nText summary:")
-print(" 18. analysis_summary_comprehensive.txt     - COMPLETE statistical analysis")
+print(" 18. analysis_summary_comprehensive.txt - COMPLETE statistical analysis")
 print("="*75 + "\n")

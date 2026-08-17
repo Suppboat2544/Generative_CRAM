@@ -41,7 +41,7 @@ def parse_molecular_formula(formula):
     
     atom_counts = {}
     for atom, count in matches:
-        if atom:  # Skip empty matches
+        if atom: # Skip empty matches
             count = int(count) if count else 1
             atom_counts[atom] = atom_counts.get(atom, 0) + count
     
@@ -85,11 +85,11 @@ def load_and_process_data(tsv_file, label):
     print(f"Loading {label} data from {tsv_file}...")
     
     df = pd.read_csv(tsv_file, sep='\t')
-    print(f"  Total identifications: {len(df)}")
+    print(f" Total identifications: {len(df)}")
     
     # Extract molecular formulas
     if 'molecular_formula' not in df.columns:
-        print(f"  WARNING: No molecular_formula column found!")
+        print(f" WARNING: No molecular_formula column found!")
         return pd.DataFrame()
     
     results = []
@@ -118,8 +118,8 @@ def load_and_process_data(tsv_file, label):
                     })
     
     result_df = pd.DataFrame(results)
-    print(f"  Valid formulas with ratios: {len(result_df)}")
-    print(f"  CRAM-like compounds: {result_df['is_CRAM'].sum()}")
+    print(f" Valid formulas with ratios: {len(result_df)}")
+    print(f" CRAM-like compounds: {result_df['is_CRAM'].sum()}")
     
     return result_df
 
@@ -136,9 +136,9 @@ def create_van_krevelen_plot(surface_df, deep_df, output_file):
                          label='CRAM Region')
     
     # Color schemes
-    surface_color = '#2E86AB'  # Blue for surface
-    deep_color = '#A23B72'     # Purple for deep
-    cram_color = '#F18F01'     # Orange for CRAM
+    surface_color = '#2E86AB' # Blue for surface
+    deep_color = '#A23B72' # Purple for deep
+    cram_color = '#F18F01' # Orange for CRAM
     
     # SUBPLOT 1: Surface Ocean
     ax1 = axes[0]
@@ -234,7 +234,7 @@ def create_van_krevelen_plot(surface_df, deep_df, output_file):
     
     plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\n✓ Van Krevelen diagram saved: {output_file}")
+    print(f"\n Van Krevelen diagram saved: {output_file}")
     plt.close()
     
     # Print statistics
@@ -242,24 +242,24 @@ def create_van_krevelen_plot(surface_df, deep_df, output_file):
     print("CRAM DOMINANCE ANALYSIS")
     print("="*60)
     print(f"\nSURFACE OCEAN:")
-    print(f"  Total compounds: {surface_total}")
-    print(f"  CRAM-like: {surface_cram_count} ({surface_cram_pct:.2f}%)")
-    print(f"  Non-CRAM: {surface_total - surface_cram_count} ({100-surface_cram_pct:.2f}%)")
+    print(f" Total compounds: {surface_total}")
+    print(f" CRAM-like: {surface_cram_count} ({surface_cram_pct:.2f}%)")
+    print(f" Non-CRAM: {surface_total - surface_cram_count} ({100-surface_cram_pct:.2f}%)")
     
     print(f"\nDEEP SEA:")
-    print(f"  Total compounds: {deep_total}")
-    print(f"  CRAM-like: {deep_cram_count} ({deep_cram_pct:.2f}%)")
-    print(f"  Non-CRAM: {deep_total - deep_cram_count} ({100-deep_cram_pct:.2f}%)")
+    print(f" Total compounds: {deep_total}")
+    print(f" CRAM-like: {deep_cram_count} ({deep_cram_pct:.2f}%)")
+    print(f" Non-CRAM: {deep_total - deep_cram_count} ({100-deep_cram_pct:.2f}%)")
     
     print(f"\nCRAM ENRICHMENT:")
     if deep_cram_pct > surface_cram_pct:
         enrichment = deep_cram_pct / surface_cram_pct if surface_cram_pct > 0 else float('inf')
-        print(f"  Deep sea has {enrichment:.2f}x more CRAM dominance than surface")
+        print(f" Deep sea has {enrichment:.2f}x more CRAM dominance than surface")
     elif surface_cram_pct > deep_cram_pct:
         enrichment = surface_cram_pct / deep_cram_pct if deep_cram_pct > 0 else float('inf')
-        print(f"  Surface has {enrichment:.2f}x more CRAM dominance than deep sea")
+        print(f" Surface has {enrichment:.2f}x more CRAM dominance than deep sea")
     else:
-        print(f"  Similar CRAM dominance in both environments")
+        print(f" Similar CRAM dominance in both environments")
     print("="*60)
 
 def main():
@@ -289,7 +289,7 @@ def main():
         # Save combined data
         combined_df = pd.concat([surface_df, deep_df], ignore_index=True)
         combined_df.to_csv('DOM_data/van_krevelen_data.csv', index=False)
-        print(f"✓ Data saved: DOM_data/van_krevelen_data.csv")
+        print(f" Data saved: DOM_data/van_krevelen_data.csv")
     else:
         print("\nERROR: No valid data found in either file!")
     

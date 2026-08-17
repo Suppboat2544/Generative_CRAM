@@ -101,7 +101,7 @@ ax.legend(handles=legend_elements, loc='upper right', frameon=True,
 add_panel_label(ax, '(a)')
 plt.tight_layout()
 plt.savefig('pca_biplot_publication.png', dpi=300, bbox_inches='tight')
-print("   Saved: pca_biplot_publication.png")
+print(" Saved: pca_biplot_publication.png")
 plt.close()
 
 # ============================================================================
@@ -224,7 +224,7 @@ add_panel_label(axes[2], '(c)', x=-0.12)
 
 plt.tight_layout()
 plt.savefig('isomer_enrichment_analysis.png', dpi=300, bbox_inches='tight')
-print("   Saved: isomer_enrichment_analysis.png")
+print(" Saved: isomer_enrichment_analysis.png")
 plt.close()
 
 # ============================================================================
@@ -316,7 +316,7 @@ for idx, (prop, label, ylim) in enumerate(properties):
 
 plt.tight_layout()
 plt.savefig('environmental_gradients.png', dpi=300, bbox_inches='tight')
-print("   Saved: environmental_gradients.png")
+print(" Saved: environmental_gradients.png")
 plt.close()
 
 # ============================================================================
@@ -335,7 +335,7 @@ non_cram_data = df[~df['is_cram']]
 
 # Normalize values to 0-1 range for radar
 cram_values = [
-    cram_data['O_C'].mean() / 0.7,  # Scale to max
+    cram_data['O_C'].mean() / 0.7, # Scale to max
     cram_data['H_C'].mean() / 2.0,
     cram_data['DBE'].mean() / 20.0,
     cram_data['AI'].mean() / 0.6,
@@ -446,7 +446,7 @@ add_panel_label(axes[1, 1], '(d)', x=-0.15)
 
 plt.tight_layout()
 plt.savefig('cram_non_cram_comparison.png', dpi=300, bbox_inches='tight')
-print("   Saved: cram_non_cram_comparison.png")
+print(" Saved: cram_non_cram_comparison.png")
 plt.close()
 
 # ============================================================================
@@ -456,16 +456,16 @@ print("\n" + "="*80)
 print("ENHANCED VISUALIZATION GENERATION COMPLETE")
 print("="*80)
 print("\nGenerated publication-quality figures:")
-print("  1. pca_biplot_publication.png - PCA with loading vectors")
-print("  2. isomer_enrichment_analysis.png - 3-panel isomer analysis")
-print("  3. environmental_gradients.png - 6-panel property gradients")
-print("  4. cram_non_cram_comparison.png - 4-panel CRAM comparison")
+print(" 1. pca_biplot_publication.png - PCA with loading vectors")
+print(" 2. isomer_enrichment_analysis.png - 3-panel isomer analysis")
+print(" 3. environmental_gradients.png - 6-panel property gradients")
+print(" 4. cram_non_cram_comparison.png - 4-panel CRAM comparison")
 print("\nKey improvements:")
-print("  ✓ Removed all titles and grids")
-print("  ✓ Added panel labels (a, b, c, d)")
-print("  ✓ Publication-quality formatting")
-print("  ✓ Statistical annotations (F-stats, p-values, correlations)")
-print("  ✓ Consistent color schemes")
-print("  ✓ Clean, minimal design")
+print(" Removed all titles and grids")
+print(" Added panel labels (a, b, c, d)")
+print(" Publication-quality formatting")
+print(" Statistical annotations (F-stats, p-values, correlations)")
+print(" Consistent color schemes")
+print(" Clean, minimal design")
 print("\nAll figures saved at 300 DPI for manuscript submission.")
 print("="*80)
