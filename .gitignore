@@ -55,8 +55,7 @@ venv.bak/
 *.sublime-workspace
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Jupyter Notebooks (this repository is Python-only)
-# ─────────────────────────────────────────────────────────────────────────────
+# Jupyter notebooks are not shipped
 *.ipynb
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
@@ -100,12 +99,13 @@ checkpoints/
 # ─────────────────────────────────────────────────────────────────────────────
 # Data Files (Large)
 # ─────────────────────────────────────────────────────────────────────────────
-data/*.csv
-data/*.xlsx
-data/*.parquet
-outputs/
-!data/.gitkeep
-!outputs/.gitkeep
+python/data/*.csv
+python/data/*.xlsx
+python/data/*.parquet
+python/outputs/
+!python/data/.gitkeep
+!python/outputs/.gitkeep
+!python/models/.gitkeep
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logs
@@ -139,3 +139,13 @@ Thumbs.db
 secrets/
 *.key
 *.pem
+
+# Java
+java/target/
+*.class
+*.jar
+!java/**/pom.xml
+
+# Julia
+julia/Manifest.toml
+julia/.julia/

@@ -16,5 +16,6 @@ Standalone Python utilities (no notebooks).
 Train:
 
 ```bash
+cd python
 python scripts/train_cvae.py --smiles-csv data/cram_molecules.csv --epochs 50 --latent-dim 64
 ```
