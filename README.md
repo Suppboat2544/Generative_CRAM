@@ -5,7 +5,7 @@
 Toolkit for **validating, encoding, and generating Carboxyl-Rich Alicyclic Molecules (CRAM)** — refractory components of marine dissolved organic matter (DOM).
 
 Public libraries under-sample this space. This repo **filters** SMILES against CRAM rules and **generates** new structures. The intended generator is the **trained 64-D Python CVAE**. Java and Julia share the chemistry rules and provide mutation / REST / CLI; they do not load `.pt` checkpoints.
-
+Drive requested based on availability
 | | |
 |--|--|
 | Architecture | [DESIGN.md](DESIGN.md) |
